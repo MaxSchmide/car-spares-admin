@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800;900&display=swap");
+@layer base {
+	* {
+		padding: 0;
+		margin: 0;
+		box-sizing: border-box;
+	}
+	html {
+		font-family: "Poppins", sans-serif;
+	}
+}
+.input,
+textarea {
+	@apply bg-transparent border-grey2 border-2 px-4 py-2 rounded-md shadow-md;
+	@apply mb-4;
+}
+
+.input:focus,
+textarea:focus,
+.input:hover,
+textarea:hover {
+	@apply outline-none border-secondaryTint;
+}
+
+label {
+	@apply text-primary;
+}
+
+.btn {
+	@apply rounded-md px-6 py-3 duration-200 hover:shadow-xl;
+}
+
+.btn--primary {
+	@apply bg-primaryTint text-white hover:bg-primary;
+}
+
+.btn--secondary {
+	@apply bg-secondary text-white hover:bg-secondaryShade;
+}
+.btn--success {
+	@apply bg-green-600 text-white hover:bg-green-700;
+}
+
+.btn--danger {
+	@apply bg-red-600 text-white hover:bg-red-700;
+}
+
+.btn--load {
+	@apply bg-gray-400 text-white opacity-50;
+}
+
+table.basic tr td {
+	@apply p-4;
+}
+table.basic tbody tr {
+	@apply bg-white;
+}
+table.basic tbody tr:not(:last-child) {
+	@apply border-b border-b-primary;
+}
