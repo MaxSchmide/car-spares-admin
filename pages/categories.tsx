@@ -1,33 +1,25 @@
 import Layout from "@/components/Layout"
 import { Spinner } from "@/components/Spinner"
+import { ICategory } from "@/models/category.model"
 import { Option } from "@/models/selectForm.models"
 import { CategoriesPageSelectStyle } from "@/utils/main"
 import axios from "axios"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
 import Select, { SingleValue } from "react-select"
 import makeAnimated from "react-select/animated"
 
-// ############## TEMP DATA ########################
-const categories = [
-	{ value: "Кузов", label: "Кузов" },
-	{ value: "Ходовая", label: "Ходовая" },
-	{ value: "Мотор", label: "Мотор" },
-	{ value: "Расходники", label: "Расходники" },
-	{ value: "Аксессуары", label: "Аксессуары" },
-	{ value: "Прочее", label: "Прочее" },
-]
-// ###################################################
-
 const CategoriesPage = () => {
+	const [categories, setCategories] = useState<ICategory[]>([])
 	const [isLoading, setIsLoading] = useState(false)
-	const [selectedCategory, setSelectedCategory] = useState<string>("")
+	const [selectedCategory, setSelectedCategory] = useState<string>()
 	const [newCategroy, setNewCategory] = useState("")
 	const animatedComponents = makeAnimated()
 
 	const selectCategory = (e: SingleValue<Option>) => {
-		setSelectedCategory(e?.value!)
+		setSelectedCategory(e?._id!)
 	}
+
 	const createCategory = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		setIsLoading(true)
@@ -49,6 +41,16 @@ const CategoriesPage = () => {
 				toast.success("Added")
 			})
 	}
+
+	const fetchCategories = async () => {
+		const res = await axios.get("/api/categories")
+		setCategories(res.data)
+	}
+
+	useEffect(() => {
+		fetchCategories()
+	}, [isLoading])
+
 	return (
 		<Layout>
 			<h1 className="text-3xl mb-8 text-secondaryShade font-bold">
@@ -57,7 +59,7 @@ const CategoriesPage = () => {
 			<h2 className="mb-2">Add new category</h2>
 			<form
 				onSubmit={(e) => createCategory(e)}
-				className="w-full flex items-center gap-8"
+				className="mb-10 w-full flex items-center gap-8"
 			>
 				<div className="input !py-1 !pr-0 w-full !mb-0 flex">
 					<input
@@ -72,8 +74,7 @@ const CategoriesPage = () => {
 						options={categories}
 						components={animatedComponents}
 						styles={CategoriesPageSelectStyle}
-						value={{ value: selectedCategory, label: selectedCategory }}
-						// placeholder="Parent category..."
+						placeholder="Parent category..."
 						isClearable
 						onChange={(e) => selectCategory(e)}
 					/>
@@ -95,6 +96,26 @@ const CategoriesPage = () => {
 					</button>
 				)}
 			</form>
+			{categories.length ? (
+				<table className="basic w-full shadow-xl border-collapse">
+					<thead className="bg-secondary text-white">
+						<tr>
+							<td>Name</td>
+							<td>Parent category</td>
+						</tr>
+					</thead>
+					<tbody>
+						{categories.map((c) => (
+							<tr key={c.value}>
+								<td>{c.label}</td>
+								<td>{c.parent?.label}</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			) : (
+				<Spinner size={10} />
+			)}
 		</Layout>
 	)
 }

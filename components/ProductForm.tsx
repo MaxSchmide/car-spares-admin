@@ -2,12 +2,13 @@
 import { Option } from "@/models/selectForm.models"
 import { ProductPageSelectStyle } from "@/utils/main"
 import axios from "axios"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
 import Select, { MultiValue } from "react-select"
 import makeAnimated from "react-select/animated"
 import { ReactSortable } from "react-sortablejs"
 import { Spinner } from "./Spinner"
+import { ICategory } from "@/models/category.model"
 
 type ProductFormProps = {
 	title?: string
@@ -18,16 +19,6 @@ type ProductFormProps = {
 	_id?: string
 	__v?: number
 }
-// ############## TEMP DATA ########################
-const categories = [
-	{ value: "Кузов", label: "Кузов" },
-	{ value: "Ходовая", label: "Ходовая" },
-	{ value: "Мотор", label: "Мотор" },
-	{ value: "Расходники", label: "Расходники" },
-	{ value: "Аксессуары", label: "Аксессуары" },
-	{ value: "Прочее", label: "Прочее" },
-]
-// ###################################################
 
 const initialState = { title: "", description: "", price: 0 }
 
@@ -39,6 +30,7 @@ const ProductForm = ({
 	images: productImages,
 	_id,
 }: ProductFormProps) => {
+	const [categories, setCategories] = useState<ICategory[]>([])
 	const [images, setImages] = useState<string[]>(productImages || [])
 	const [selectedCategories, setSelectedCategories] = useState<string[]>(
 		productCategories || []
@@ -52,6 +44,10 @@ const ProductForm = ({
 
 	const selectCategories = (e: MultiValue<Option>) => {
 		setSelectedCategories(e.map((c) => c.value))
+	}
+	const fetchCategories = async () => {
+		const res = await axios.get("/api/categories")
+		setCategories(res.data)
 	}
 
 	const uploadImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,6 +111,10 @@ const ProductForm = ({
 				})
 		}
 	}
+
+	useEffect(() => {
+		fetchCategories()
+	}, [])
 
 	return (
 		<>
@@ -218,15 +218,15 @@ const ProductForm = ({
 							/>
 						</svg>
 						Upload photos
+						<input
+							className="hidden"
+							type="file"
+							name="photos"
+							id="photos"
+							multiple
+							onChange={(e) => uploadImages(e)}
+						/>
 					</label>
-					<input
-						className="hidden"
-						type="file"
-						name="photos"
-						id="photos"
-						multiple
-						onChange={(e) => uploadImages(e)}
-					/>
 				</div>
 				<label htmlFor="price">Product Price</label>
 				<input
