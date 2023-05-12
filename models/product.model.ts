@@ -1,4 +1,5 @@
 import mongoose, { Schema, model, models } from "mongoose"
+import { ICategory } from "./category.model"
 
 const ProductSchema = new Schema({
 	title: { type: String, required: true },
@@ -14,7 +15,7 @@ export interface IProduct {
 	title: string
 	description: string
 	price: number
-	categories: any[]
+	categories: ICategory[]
 	images: string[]
 	_id: string
 	__v: number

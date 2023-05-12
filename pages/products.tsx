@@ -16,17 +16,23 @@ const ProductsPage = () => {
 		setIsLoading(true)
 		await axios.get("/api/products").then((res) => {
 			setProducts(res.data)
+			console.log(res.data)
 			setIsLoading(false)
 		})
 	}
 
 	useEffect(() => {
 		fetchProducts()
-	}, [showModal])
+	}, [])
 
 	const openModalToDelete = (product: IProduct) => {
 		setModalData(product)
 		setShowModal(true)
+	}
+
+	const deleteProduct = async () => {
+		await axios.delete("/api/products?id=" + modalData?._id)
+		fetchProducts()
 	}
 
 	return (
@@ -46,13 +52,19 @@ const ProductsPage = () => {
 							<thead className="bg-secondary text-white">
 								<tr>
 									<td>Product Name</td>
+									<td>Category</td>
 									<td></td>
 								</tr>
 							</thead>
 							<tbody>
 								{products.map((product) => (
 									<tr key={product._id}>
-										<td className="w-full">{product.title}</td>
+										<td className="w-3/4">{product.title}</td>
+										<td className="w-1/4">
+											{product.categories.map((category) => (
+												<p key={category._id}>{category.label}</p>
+											))}
+										</td>
 										<td className="flex w-fit gap-2 items-center">
 											<Link
 												className="btn btn--success !p-2"
@@ -107,6 +119,7 @@ const ProductsPage = () => {
 			<ModalDelete
 				show={showModal}
 				onClose={() => setShowModal(false)}
+				onDelete={deleteProduct}
 				product={modalData}
 			/>
 		</Layout>

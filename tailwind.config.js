@@ -19,6 +19,19 @@ module.exports = {
 			pointerEvents: {
 				all: "all",
 			},
+			animation: {
+				"zoom-in": "zoomIn .2s ease-in-out ",
+			},
+			keyframes: {
+				zoomIn: {
+					"0%": {
+						transform: "scale(0)",
+					},
+					"100%": {
+						transform: "scale(1)",
+					},
+				},
+			},
 		},
 	},
 	plugins: [],

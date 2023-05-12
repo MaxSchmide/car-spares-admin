@@ -19,7 +19,7 @@ export default async function handle(
 						await Product.findOne({ _id: req.query.id }).populate("categories")
 					)
 				} else {
-					res.json(await Product.find())
+					res.json(await Product.find().populate("categories"))
 				}
 				break
 			case "POST":

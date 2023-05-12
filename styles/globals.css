@@ -53,6 +53,7 @@ label {
 	@apply bg-gray-400 text-white opacity-50;
 }
 
+table.basic tr th,
 table.basic tr td {
 	@apply p-4;
 }
