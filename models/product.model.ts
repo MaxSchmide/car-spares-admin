@@ -1,10 +1,10 @@
-import { Schema, model, models } from "mongoose"
+import mongoose, { Schema, model, models } from "mongoose"
 
 const ProductSchema = new Schema({
 	title: { type: String, required: true },
 	description: String,
 	price: { type: Number, required: true },
-	categories: { type: [String], required: true },
+	categories: [{ type: mongoose.Types.ObjectId, ref: "Category" }],
 	images: [String],
 })
 
@@ -14,7 +14,7 @@ export interface IProduct {
 	title: string
 	description: string
 	price: number
-	categories: string[]
+	categories: any[]
 	images: string[]
 	_id: string
 	__v: number

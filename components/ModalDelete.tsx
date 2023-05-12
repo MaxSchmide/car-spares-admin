@@ -27,7 +27,7 @@ function ModalDelete({ show, onClose, product }: ModalProps) {
 	}
 
 	const modalContent = show ? (
-		<div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-10">
+		<div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-0">
 			<div className="bg-white max-w-4/5 max-h-4/5 rounded-xl p-4 w-auto h-auto z-20">
 				<div
 					id="head"
@@ -44,7 +44,7 @@ function ModalDelete({ show, onClose, product }: ModalProps) {
 				>
 					<button
 						className="btn btn--danger"
-						onClick={(e) => deleteProduct(e)}
+						onClick={deleteProduct}
 					>
 						Yes
 					</button>

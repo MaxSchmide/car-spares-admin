@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-import { Option } from "@/models/selectForm.models"
 import { ProductPageSelectStyle } from "@/utils/main"
 import axios from "axios"
 import React, { useEffect, useState } from "react"
@@ -9,16 +8,7 @@ import makeAnimated from "react-select/animated"
 import { ReactSortable } from "react-sortablejs"
 import { Spinner } from "./Spinner"
 import { ICategory } from "@/models/category.model"
-
-type ProductFormProps = {
-	title?: string
-	description?: string
-	price?: number
-	categories?: string[]
-	images?: any
-	_id?: string
-	__v?: number
-}
+import { IProduct } from "@/models/product.model"
 
 const initialState = { title: "", description: "", price: 0 }
 
@@ -29,10 +19,10 @@ const ProductForm = ({
 	categories: productCategories,
 	images: productImages,
 	_id,
-}: ProductFormProps) => {
+}: IProduct) => {
 	const [categories, setCategories] = useState<ICategory[]>([])
 	const [images, setImages] = useState<string[]>(productImages || [])
-	const [selectedCategories, setSelectedCategories] = useState<string[]>(
+	const [selectedCategories, setSelectedCategories] = useState<ICategory[]>(
 		productCategories || []
 	)
 	const [isUploading, setIsUploading] = useState(false)
@@ -42,9 +32,10 @@ const ProductForm = ({
 	)
 	const animatedComponents = makeAnimated()
 
-	const selectCategories = (e: MultiValue<Option>) => {
-		setSelectedCategories(e.map((c) => c.value))
+	const selectCategories = (e: MultiValue<ICategory>) => {
+		setSelectedCategories(e.map((c) => c))
 	}
+
 	const fetchCategories = async () => {
 		const res = await axios.get("/api/categories")
 		setCategories(res.data)
@@ -82,13 +73,12 @@ const ProductForm = ({
 	const saveProduct = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setIsLoading(true)
-
+		const assignedCategories = selectedCategories.map((c) => c._id)
+		const data = { ...details, images, categories: assignedCategories }
 		if (_id) {
 			await axios
 				.put("/api/products", {
-					...details,
-					images,
-					categories: selectedCategories,
+					...data,
 					_id,
 				})
 				.then(() => {
@@ -96,19 +86,13 @@ const ProductForm = ({
 					setIsLoading(false)
 				})
 		} else {
-			await axios
-				.post("/api/products", {
-					...details,
-					images,
-					categories: selectedCategories,
-				})
-				.then(() => {
-					toast.success("Added")
-					setSelectedCategories([])
-					setImages([])
-					setDetails(initialState)
-					setIsLoading(false)
-				})
+			await axios.post("/api/products", data).then(() => {
+				toast.success("Added")
+				setSelectedCategories([])
+				setImages([])
+				setDetails(initialState)
+				setIsLoading(false)
+			})
 		}
 	}
 
@@ -136,13 +120,11 @@ const ProductForm = ({
 				<label htmlFor="categories">Categories</label>
 				<Select
 					required
-					options={categories}
+					options={categories.map((c) => ({ ...c, value: c._id }))}
 					styles={ProductPageSelectStyle}
 					closeMenuOnSelect={false}
+					value={selectedCategories?.map((c) => ({ ...c, value: c._id }))}
 					components={animatedComponents}
-					value={selectedCategories?.map((i) => {
-						return { value: i, label: i }
-					})}
 					isMulti
 					onChange={(e) => selectCategories(e)}
 				/>

@@ -10,7 +10,7 @@ export default async function handle(
 		await mongooseConnect()
 		const {
 			method,
-			body: { label, value, selectedCategory },
+			body: { label, parent },
 		} = req
 		switch (method) {
 			case "GET":
@@ -19,8 +19,7 @@ export default async function handle(
 			case "POST":
 				const categoryDoc = await Category.create({
 					label,
-					value,
-					parent: selectedCategory,
+					parent,
 				})
 				res.json(categoryDoc)
 				break

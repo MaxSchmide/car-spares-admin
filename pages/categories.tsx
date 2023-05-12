@@ -1,7 +1,6 @@
 import Layout from "@/components/Layout"
 import { Spinner } from "@/components/Spinner"
 import { ICategory } from "@/models/category.model"
-import { Option } from "@/models/selectForm.models"
 import { CategoriesPageSelectStyle } from "@/utils/main"
 import axios from "axios"
 import { useEffect, useState } from "react"
@@ -12,34 +11,31 @@ import makeAnimated from "react-select/animated"
 const CategoriesPage = () => {
 	const [categories, setCategories] = useState<ICategory[]>([])
 	const [isLoading, setIsLoading] = useState(false)
-	const [selectedCategory, setSelectedCategory] = useState<string>()
-	const [newCategroy, setNewCategory] = useState("")
+	const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(
+		null
+	)
+	const [categoryTitle, setCategoryTitle] = useState("")
 	const animatedComponents = makeAnimated()
 
-	const selectCategory = (e: SingleValue<Option>) => {
-		setSelectedCategory(e?._id!)
+	const selectCategory = (e: SingleValue<ICategory>) => {
+		setSelectedCategory(e)
 	}
 
 	const createCategory = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		setIsLoading(true)
 
-		const category = {
-			label: newCategroy,
-			value: newCategroy,
+		const data = {
+			label: categoryTitle,
+			parent: selectedCategory?._id,
 		}
 
-		await axios
-			.post("/api/categories", {
-				...category,
-				selectedCategory,
-			})
-			.then(() => {
-				setSelectedCategory("")
-				setNewCategory("")
-				setIsLoading(false)
-				toast.success("Added")
-			})
+		await axios.post("/api/categories", data).then(() => {
+			setSelectedCategory(null)
+			setCategoryTitle("")
+			setIsLoading(false)
+			toast.success("Added")
+		})
 	}
 
 	const fetchCategories = async () => {
@@ -67,13 +63,16 @@ const CategoriesPage = () => {
 						placeholder="Enter category name..."
 						type="text"
 						id="category"
-						value={newCategroy}
-						onChange={(e) => setNewCategory(e.target.value)}
+						value={categoryTitle}
+						onChange={(e) => setCategoryTitle(e.target.value)}
 					/>
 					<Select
-						options={categories}
+						options={categories.map((cat) => {
+							return { ...cat, value: cat._id }
+						})}
 						components={animatedComponents}
 						styles={CategoriesPageSelectStyle}
+						value={selectedCategory}
 						placeholder="Parent category..."
 						isClearable
 						onChange={(e) => selectCategory(e)}
@@ -92,7 +91,7 @@ const CategoriesPage = () => {
 						type="submit"
 						className="w-1/6 btn btn--secondary"
 					>
-						SAVE
+						Save
 					</button>
 				)}
 			</form>
@@ -106,7 +105,7 @@ const CategoriesPage = () => {
 					</thead>
 					<tbody>
 						{categories.map((c) => (
-							<tr key={c.value}>
+							<tr key={c._id}>
 								<td>{c.label}</td>
 								<td>{c.parent?.label}</td>
 							</tr>

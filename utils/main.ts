@@ -1,7 +1,11 @@
-import { Group, Option } from "@/models/selectForm.models"
-import { StylesConfig } from "react-select"
+import { ICategory } from "@/models/category.model"
+import { GroupBase, StylesConfig } from "react-select"
 
-export const ProductPageSelectStyle: StylesConfig<Option, true, Group> = {
+export const ProductPageSelectStyle: StylesConfig<
+	ICategory,
+	true,
+	GroupBase<ICategory>
+> = {
 	option: (styles, { isDisabled, isFocused, isSelected }) => {
 		return {
 			...styles,
@@ -56,7 +60,11 @@ export const ProductPageSelectStyle: StylesConfig<Option, true, Group> = {
 	},
 }
 
-export const CategoriesPageSelectStyle: StylesConfig<Option, false, Group> = {
+export const CategoriesPageSelectStyle: StylesConfig<
+	ICategory,
+	false,
+	GroupBase<ICategory>
+> = {
 	container: (styles) => ({
 		...styles,
 		width: "30%",

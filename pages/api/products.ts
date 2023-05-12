@@ -15,7 +15,9 @@ export default async function handle(
 		switch (method) {
 			case "GET":
 				if (req.query?.id) {
-					res.json(await Product.findOne({ _id: req.query.id }))
+					res.json(
+						await Product.findOne({ _id: req.query.id }).populate("categories")
+					)
 				} else {
 					res.json(await Product.find())
 				}
