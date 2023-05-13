@@ -16,7 +16,6 @@ const ProductsPage = () => {
 		setIsLoading(true)
 		await axios.get("/api/products").then((res) => {
 			setProducts(res.data)
-			console.log(res.data)
 			setIsLoading(false)
 		})
 	}

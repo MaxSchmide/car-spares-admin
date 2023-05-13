@@ -1,5 +1,7 @@
+import { mongooseConnect } from "@/lib/mongoose"
 import { DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import { NextApiRequest, NextApiResponse } from "next"
+import { isAdminRequest } from "./auth/[...nextauth]"
 
 const bucketName = "car-spares"
 
@@ -8,6 +10,9 @@ export default async function handle(
 	res: NextApiResponse
 ) {
 	try {
+		await mongooseConnect()
+		await isAdminRequest(req, res)
+
 		const { id } = req.query
 		const doc = (id as string).split("/").pop()
 		const client = new S3Client({

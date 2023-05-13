@@ -2,8 +2,14 @@ import Image from "next/image"
 import Link from "next/link"
 import logo from "@/assets/logo_white.svg"
 import { signOut, useSession } from "next-auth/react"
+import { useRouter } from "next/router"
 const Header = () => {
+	const router = useRouter()
 	const { data: session } = useSession()
+	const logout = async () => {
+		await router.push("/")
+		await signOut()
+	}
 	return (
 		<header className="flex justify-between p-4 items-center text-white bg-primary border-b-2 border-b-secondary">
 			<Link
@@ -20,7 +26,7 @@ const Header = () => {
 			</Link>
 
 			<div className="flex items-center gap-4">
-				<button onClick={() => signOut()}>
+				<button onClick={logout}>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						fill="none"

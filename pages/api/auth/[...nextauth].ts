@@ -1,9 +1,13 @@
 import clientPromise from "@/lib/mongodb"
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter"
-import NextAuth from "next-auth/next"
+import { NextApiRequest, NextApiResponse } from "next"
+import { AuthOptions } from "next-auth"
+import NextAuth, { getServerSession } from "next-auth/next"
 import GoogleProvider from "next-auth/providers/google"
 
-export const authOptions = {
+const adminList = ["schmide.max@gmail.com"]
+
+export const authOptions: AuthOptions = {
 	adapter: MongoDBAdapter(clientPromise),
 	providers: [
 		GoogleProvider({
@@ -12,6 +16,20 @@ export const authOptions = {
 		}),
 	],
 	secret: process.env.NEXTAUTH_SECRET,
+	callbacks: {
+		session({ session, token, user }) {
+			if (adminList.includes(session.user.email!)) return session
+			else throw "Not a valid permitions"
+		},
+	},
 }
 
 export default NextAuth(authOptions)
+
+export const isAdminRequest = async (
+	req: NextApiRequest,
+	res: NextApiResponse
+) => {
+	const session = await getServerSession(req, res, authOptions)
+	if (!adminList.includes(session?.user.email!)) res.status(401).end()
+}

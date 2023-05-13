@@ -1,6 +1,7 @@
 import { mongooseConnect } from "@/lib/mongoose"
 import { Product } from "@/models/product.model"
 import type { NextApiRequest, NextApiResponse } from "next"
+import { isAdminRequest } from "./auth/[...nextauth]"
 
 export default async function handle(
 	req: NextApiRequest,
@@ -8,6 +9,8 @@ export default async function handle(
 ) {
 	try {
 		await mongooseConnect()
+		await isAdminRequest(req, res)
+
 		const {
 			method,
 			body: { title, description, price, _id, categories, images },

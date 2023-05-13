@@ -3,6 +3,8 @@ import multiparty from "multiparty"
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3"
 import fs from "fs"
 import mime from "mime-types"
+import { mongooseConnect } from "@/lib/mongoose"
+import { isAdminRequest } from "./auth/[...nextauth]"
 
 const bucketName = "car-spares"
 
@@ -11,6 +13,9 @@ export default async function handle(
 	res: NextApiResponse
 ) {
 	try {
+		await mongooseConnect()
+		await isAdminRequest(req, res)
+
 		const form = new multiparty.Form()
 		const { files } = await new Promise<any>((resolve, reject) => {
 			form.parse(req, (err, fields, files) => {
