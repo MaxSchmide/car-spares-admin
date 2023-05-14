@@ -1,9 +1,4 @@
-import { useRouter } from "next/router"
-import React from "react"
-
 const ErrorPage = () => {
-	const { query: error } = useRouter()
-	console.log(error)
 	return (
 		<div className="bg-blue-900 min-h-screen">
 			<use className="relative block">
