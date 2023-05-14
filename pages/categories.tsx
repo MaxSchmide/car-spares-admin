@@ -4,7 +4,8 @@ import { Spinner } from "@/components/Spinner"
 import { ICategory } from "@/models/category.model"
 import { CategoriesPageSelectStyle } from "@/utils/main"
 import axios from "axios"
-import { useEffect, useState } from "react"
+import { Router, useRouter } from "next/router"
+import { useCallback, useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
 import Select, { SingleValue } from "react-select"
 import makeAnimated from "react-select/animated"
@@ -19,6 +20,7 @@ const CategoriesPage = () => {
 	const [modalData, setModalData] = useState<ICategory>()
 	const [showModal, setShowModal] = useState(false)
 	const [categoryTitle, setCategoryTitle] = useState("")
+	const router = useRouter()
 	const animatedComponents = makeAnimated()
 
 	const selectCategory = (e: SingleValue<ICategory>) => {
@@ -52,17 +54,24 @@ const CategoriesPage = () => {
 		})
 	}
 
-	const fetchCategories = async () => {
+	const fetchCategories = useCallback(async () => {
 		setIsFetching(true)
-		await axios.get("/api/categories").then((res) => {
-			setCategories(res.data)
-			setIsFetching(false)
-		})
-	}
+		await axios
+			.get("/api/categories")
+			.then((res) => {
+				setCategories(res.data)
+				setIsFetching(false)
+			})
+			.catch((e) => {
+				e.response.status === 403
+					? router.push("auth/error?error=AccessDenied")
+					: console.log(e)
+			})
+	}, [router])
 
 	useEffect(() => {
 		fetchCategories()
-	}, [isPending])
+	}, [isPending, fetchCategories])
 
 	return (
 		<Layout>

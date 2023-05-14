@@ -1,6 +1,7 @@
 import clientPromise from "@/lib/mongodb"
 import { mongooseConnect } from "@/lib/mongoose"
 import { Admin, IAdmin } from "@/models/admin.model"
+import ErrorPage from "@/pages/auth/error"
 import { User } from "@/types/next-auth"
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter"
 import { NextApiRequest, NextApiResponse } from "next"
@@ -8,6 +9,8 @@ import { AuthOptions } from "next-auth"
 import NextAuth, { getServerSession } from "next-auth/next"
 import GoogleProvider from "next-auth/providers/google"
 import { useRouter } from "next/router"
+import ReactDOMServer from "react-dom/server"
+
 export const authOptions: AuthOptions = {
 	adapter: MongoDBAdapter(clientPromise),
 	providers: [
@@ -44,7 +47,7 @@ export const isAdminRequest = async (
 ) => {
 	const session = await getServerSession(req, res, authOptions)
 	const admin = await findInAdminList(session?.user)
-	if (!admin) res.status(401).end()
+	if (!admin) res.status(403).end()
 }
 
 const findInAdminList = async (user?: User) => {

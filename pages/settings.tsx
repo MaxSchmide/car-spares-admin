@@ -3,7 +3,8 @@ import ModalDelete from "@/components/ModalDelete"
 import { IAdmin } from "@/models/admin.model"
 import axios from "axios"
 import { useSession } from "next-auth/react"
-import React, { useEffect, useState } from "react"
+import { useRouter } from "next/router"
+import React, { useCallback, useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
 
 const SettingPage = () => {
@@ -12,6 +13,7 @@ const SettingPage = () => {
 	const [admins, setAdmins] = useState<IAdmin[]>([])
 	const [modalData, setModalData] = useState<IAdmin>()
 	const [showModal, setShowModal] = useState(false)
+	const router = useRouter()
 
 	const addAdmin = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
@@ -32,13 +34,20 @@ const SettingPage = () => {
 		setShowModal(true)
 	}
 
-	const fetchAdmins = async () => {
-		const res = await axios.get("/api/admins")
-		setAdmins(res.data)
-	}
+	const fetchAdmins = useCallback(async () => {
+		await axios
+			.get("/api/admins")
+			.then((res) => setAdmins(res.data))
+			.catch((e) => {
+				e.response.status === 403
+					? router.push("auth/error?error=AccessDenied")
+					: console.log(e)
+			})
+	}, [router])
+
 	useEffect(() => {
 		fetchAdmins()
-	}, [])
+	}, [fetchAdmins])
 
 	return (
 		<Layout>

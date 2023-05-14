@@ -4,25 +4,34 @@ import { Spinner } from "@/components/Spinner"
 import { IProduct } from "@/models/product.model"
 import axios from "axios"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useRouter } from "next/router"
+import { useCallback, useEffect, useState } from "react"
 
 const ProductsPage = () => {
 	const [isLoading, setIsLoading] = useState(false)
 	const [products, setProducts] = useState<IProduct[]>([])
 	const [showModal, setShowModal] = useState(false)
 	const [modalData, setModalData] = useState<IProduct>()
+	const router = useRouter()
 
-	const fetchProducts = async () => {
+	const fetchProducts = useCallback(async () => {
 		setIsLoading(true)
-		await axios.get("/api/products").then((res) => {
-			setProducts(res.data)
-			setIsLoading(false)
-		})
-	}
+		await axios
+			.get("/api/products")
+			.then((res) => {
+				setProducts(res.data)
+				setIsLoading(false)
+			})
+			.catch((e) => {
+				e.response.status === 403
+					? router.push("auth/error?error=AccessDenied")
+					: console.log(e)
+			})
+	}, [router])
 
 	useEffect(() => {
 		fetchProducts()
-	}, [])
+	}, [fetchProducts])
 
 	const openModalToDelete = (product: IProduct) => {
 		setModalData(product)
