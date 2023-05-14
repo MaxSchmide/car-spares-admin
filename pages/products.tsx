@@ -47,8 +47,8 @@ const ProductsPage = () => {
 			<main>
 				{!isLoading ? (
 					products.length ? (
-						<table className="basic w-full shadow-xl border-collapse">
-							<thead className="bg-secondary text-white">
+						<table className="basic">
+							<thead>
 								<tr>
 									<td>Product Name</td>
 									<td>Category</td>

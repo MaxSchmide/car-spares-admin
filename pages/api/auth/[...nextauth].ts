@@ -1,12 +1,13 @@
 import clientPromise from "@/lib/mongodb"
+import { mongooseConnect } from "@/lib/mongoose"
+import { Admin, IAdmin } from "@/models/admin.model"
+import { User } from "@/types/next-auth"
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter"
 import { NextApiRequest, NextApiResponse } from "next"
 import { AuthOptions } from "next-auth"
 import NextAuth, { getServerSession } from "next-auth/next"
 import GoogleProvider from "next-auth/providers/google"
-
-const adminList = ["schmide.max@gmail.com"]
-
+import { useRouter } from "next/router"
 export const authOptions: AuthOptions = {
 	adapter: MongoDBAdapter(clientPromise),
 	providers: [
@@ -15,11 +16,22 @@ export const authOptions: AuthOptions = {
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET,
 		}),
 	],
+	session: {
+		strategy: "jwt",
+	},
+	pages: {
+		error: "/auth/error",
+	},
 	secret: process.env.NEXTAUTH_SECRET,
 	callbacks: {
-		session({ session, token, user }) {
-			if (adminList.includes(session.user.email!)) return session
-			else throw "Not a valid permitions"
+		signIn: async ({ user }) => {
+			const admin = await isAdmin(user)
+			return !!admin
+		},
+		session: async ({ session }) => {
+			const { role } = await isAdmin(session?.user)
+			session.user.role = role
+			return session
 		},
 	},
 }
@@ -31,5 +43,13 @@ export const isAdminRequest = async (
 	res: NextApiResponse
 ) => {
 	const session = await getServerSession(req, res, authOptions)
-	if (!adminList.includes(session?.user.email!)) res.status(401).end()
+	const admin = await isAdmin(session?.user)
+	if (!admin) res.status(401).end()
+}
+
+const isAdmin = async (user?: User) => {
+	await mongooseConnect()
+	const admins = await Admin.find()
+	const admin: IAdmin = admins.find((admin) => admin.email === user?.email)
+	return admin
 }

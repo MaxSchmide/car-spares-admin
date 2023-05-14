@@ -31,7 +31,6 @@ export default async function handle(
 
 		return res.status(200).json({ message: "Deleted" })
 	} catch (e) {
-		console.error(e)
 		res.status(500).json({ message: "Internal server error" })
 	}
 }

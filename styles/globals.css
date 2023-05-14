@@ -53,6 +53,12 @@ label {
 	@apply bg-gray-400 text-white opacity-50;
 }
 
+table.basic {
+	@apply w-full shadow-xl border-collapse;
+}
+table.basic thead {
+	@apply bg-secondary text-white;
+}
 table.basic tr th,
 table.basic tr td {
 	@apply p-4;

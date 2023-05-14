@@ -1,7 +1,7 @@
 import { mongooseConnect } from "@/lib/mongoose"
-import { Category } from "@/models/category.model"
 import { NextApiRequest, NextApiResponse } from "next"
 import { isAdminRequest } from "./auth/[...nextauth]"
+import { Admin } from "@/models/admin.model"
 
 export default async function handle(
 	req: NextApiRequest,
@@ -9,27 +9,30 @@ export default async function handle(
 ) {
 	try {
 		await mongooseConnect()
-		await isAdminRequest(req,res)
+		await isAdminRequest(req, res)
 
 		const {
 			method,
-			body: { label, parent },
+			query,
+			body: { email, role },
 		} = req
+
 		switch (method) {
 			case "GET":
-				res.json(await Category.find().populate("parent"))
+				res.json(await Admin.find())
 				break
 			case "POST":
-				const categoryDoc = await Category.create({
-					label,
-					parent,
+				const adminDoc = await Admin.create({
+					email,
+					role,
 				})
-				res.json(categoryDoc)
+				res.json(adminDoc)
 				break
 			case "DELETE":
-				const { _id } = req.query
-				await Category.deleteOne({ _id })
+				const { _id } = query
+				await Admin.deleteOne({ _id })
 				res.json(true)
+				break
 			default:
 				res.status(400).json({ message: "Invalid request" })
 		}

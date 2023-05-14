@@ -52,7 +52,6 @@ export default async function handle(
 		}
 		return res.json({ links })
 	} catch (e) {
-		console.error(e)
 		res.status(500).json({ message: "Internal server error" })
 	}
 }

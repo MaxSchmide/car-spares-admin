@@ -115,8 +115,8 @@ const CategoriesPage = () => {
 				</form>
 				{!isFetching ? (
 					categories.length ? (
-						<table className="basic w-full shadow-xl border-collapse">
-							<thead className="bg-secondary text-white">
+						<table className="basic">
+							<thead>
 								<tr>
 									<td>Name</td>
 									<td>Parent category</td>

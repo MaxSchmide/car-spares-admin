@@ -49,7 +49,7 @@ export default async function handle(
 				}
 				break
 			default:
-				res.status(404).json({ message: "Invalid request" })
+				res.status(400).json({ message: "Invalid request" })
 		}
 	} catch (e) {
 		console.error(e)

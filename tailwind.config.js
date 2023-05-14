@@ -20,9 +20,21 @@ module.exports = {
 				all: "all",
 			},
 			animation: {
+				wiggle: "wiggle .2s infinite",
 				"zoom-in": "zoomIn .2s ease-in-out ",
 			},
 			keyframes: {
+				wiggle: {
+					"0%": {
+						transform: "rotate(3deg)",
+					},
+					"50%": {
+						transform: " rotate(0deg)",
+					},
+					"100%": {
+						transform: "rotate(3deg)",
+					},
+				},
 				zoomIn: {
 					"0%": {
 						transform: "scale(0)",

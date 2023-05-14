@@ -1,3 +1,4 @@
+import { IAdmin } from "@/models/admin.model"
 import { ICategory } from "@/models/category.model"
 import { IProduct } from "@/models/product.model"
 import axios from "axios"
@@ -10,6 +11,7 @@ type ModalProps = {
 	onDelete: () => void
 	product?: IProduct
 	category?: ICategory
+	admin?: IAdmin
 }
 
 function ModalDelete({
@@ -18,9 +20,14 @@ function ModalDelete({
 	onDelete,
 	product,
 	category,
+	admin,
 }: ModalProps) {
 	const [isBrowser, setIsBrowser] = useState(false)
-	const title = product ? product.title : category?.label
+	const title = product
+		? product.title
+		: category
+		? category?.label
+		: admin?.email
 	useEffect(() => {
 		setIsBrowser(true)
 	}, [])
