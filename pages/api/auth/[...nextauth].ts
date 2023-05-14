@@ -1,15 +1,12 @@
 import clientPromise from "@/lib/mongodb"
 import { mongooseConnect } from "@/lib/mongoose"
 import { Admin, IAdmin } from "@/models/admin.model"
-import ErrorPage from "@/pages/auth/error"
 import { User } from "@/types/next-auth"
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter"
 import { NextApiRequest, NextApiResponse } from "next"
 import { AuthOptions } from "next-auth"
 import NextAuth, { getServerSession } from "next-auth/next"
 import GoogleProvider from "next-auth/providers/google"
-import { useRouter } from "next/router"
-import ReactDOMServer from "react-dom/server"
 
 export const authOptions: AuthOptions = {
 	adapter: MongoDBAdapter(clientPromise),
@@ -23,6 +20,7 @@ export const authOptions: AuthOptions = {
 		strategy: "jwt",
 	},
 	pages: {
+		signIn: "/auth/signin",
 		error: "/auth/error",
 	},
 	secret: process.env.NEXTAUTH_SECRET,

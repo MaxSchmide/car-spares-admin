@@ -14,7 +14,7 @@ const ErrorPage = () => {
 					x="0px"
 					y="0px"
 					viewBox="0 0 1000 1000"
-					enable-background="new 0 0 1000 1000"
+					enableBackground="new 0 0 1000 1000"
 					xmlSpace="preserve"
 					className="w-1/5 fill-[#f95959] py-24 mx-[40%] text-left -translate-x-1/2 -translate-y-1/2 rotate-0 animate-wiggle"
 				>

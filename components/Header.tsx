@@ -3,11 +3,13 @@ import Link from "next/link"
 import logo from "@/assets/logo_white.svg"
 import { signOut, useSession } from "next-auth/react"
 import { useRouter } from "next/router"
+
 const Header = () => {
 	const router = useRouter()
 	const { data: session } = useSession()
+
 	const logout = async () => {
-		await router.push("/")
+		await router.push("auth/signin")
 		await signOut()
 	}
 	return (
