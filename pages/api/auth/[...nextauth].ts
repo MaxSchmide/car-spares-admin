@@ -25,11 +25,11 @@ export const authOptions: AuthOptions = {
 	secret: process.env.NEXTAUTH_SECRET,
 	callbacks: {
 		signIn: async ({ user }) => {
-			const admin = await isAdmin(user)
-			return !!admin
+			const { email } = await findInAdminList(user)
+			return email === user.email
 		},
 		session: async ({ session }) => {
-			const { role } = await isAdmin(session?.user)
+			const { role } = await findInAdminList(session?.user)
 			session.user.role = role
 			return session
 		},
@@ -43,11 +43,11 @@ export const isAdminRequest = async (
 	res: NextApiResponse
 ) => {
 	const session = await getServerSession(req, res, authOptions)
-	const admin = await isAdmin(session?.user)
+	const admin = await findInAdminList(session?.user)
 	if (!admin) res.status(401).end()
 }
 
-const isAdmin = async (user?: User) => {
+const findInAdminList = async (user?: User) => {
 	await mongooseConnect()
 	const admins = await Admin.find()
 	const admin: IAdmin = admins.find((admin) => admin.email === user?.email)
