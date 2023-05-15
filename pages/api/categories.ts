@@ -9,7 +9,7 @@ export default async function handle(
 ) {
 	try {
 		await mongooseConnect()
-		await isAdminRequest(req,res)
+		await isAdminRequest(req, res)
 
 		const {
 			method,
@@ -29,7 +29,7 @@ export default async function handle(
 			case "DELETE":
 				const { _id } = req.query
 				await Category.deleteOne({ _id })
-				res.json(true)
+				res.status(200)
 			default:
 				res.status(400).json({ message: "Invalid request" })
 		}

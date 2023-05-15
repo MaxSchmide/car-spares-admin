@@ -24,7 +24,7 @@ export const authOptions: AuthOptions = {
 	callbacks: {
 		signIn: async ({ user }) => {
 			const { email } = await findInAdminList(user)
-			return email === user.email
+			return user.email === email
 		},
 		session: async ({ session }) => {
 			const { role } = await findInAdminList(session?.user)
@@ -47,7 +47,6 @@ export const isAdminRequest = async (
 
 const findInAdminList = async (user?: User) => {
 	await mongooseConnect()
-	const admins = await Admin.find()
-	const admin: IAdmin = admins.find((admin) => admin.email === user?.email)
+	const admin = await Admin.findOne({ email: user?.email })
 	return admin
 }
