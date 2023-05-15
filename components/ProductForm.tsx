@@ -18,6 +18,16 @@ const initialState = {
 	article: "",
 	analogs: "",
 }
+interface Props {
+	title?: string
+	description?: string
+	price?: number
+	categories?: ICategory[]
+	images?: string[]
+	article?: string
+	analogs?: string[]
+	_id?: string
+}
 
 const ProductForm = ({
 	title,
@@ -28,7 +38,7 @@ const ProductForm = ({
 	article,
 	analogs: productAnalogs,
 	_id,
-}: IProduct) => {
+}: Props) => {
 	const [categories, setCategories] = useState<ICategory[]>([])
 	const [images, setImages] = useState<string[]>(productImages || [])
 	const [selectedCategories, setSelectedCategories] = useState<ICategory[]>(
@@ -91,7 +101,7 @@ const ProductForm = ({
 		const assignedCategories = selectedCategories.map((c) => c._id)
 		const data = {
 			...details,
-			analogs: details.analogs.split(","),
+			analogs: details?.analogs?.split(","),
 			images,
 			categories: assignedCategories,
 		}
