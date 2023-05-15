@@ -11,7 +11,13 @@ import { ICategory } from "@/models/category.model"
 import { XMarkIcon, DocumentArrowUpIcon } from "@heroicons/react/24/outline"
 import { IProduct } from "@/models/product.model"
 
-const initialState = { title: "", description: "", price: 0 }
+const initialState = {
+	title: "",
+	description: "",
+	price: 0,
+	article: "",
+	analogs: "",
+}
 
 const ProductForm = ({
 	title,
@@ -19,6 +25,8 @@ const ProductForm = ({
 	price,
 	categories: productCategories,
 	images: productImages,
+	article,
+	analogs: productAnalogs,
 	_id,
 }: IProduct) => {
 	const [categories, setCategories] = useState<ICategory[]>([])
@@ -29,7 +37,8 @@ const ProductForm = ({
 	const [isUploading, setIsUploading] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
 	const [details, setDetails] = useState(
-		{ title, description, price } || initialState
+		{ title, description, price, article, analogs: productAnalogs.join(",") } ||
+			initialState
 	)
 	const animatedComponents = makeAnimated()
 
@@ -73,9 +82,15 @@ const ProductForm = ({
 
 	const saveProduct = async (e: React.FormEvent) => {
 		e.preventDefault()
+		console.log(details.analogs.split(","))
 		setIsLoading(true)
 		const assignedCategories = selectedCategories.map((c) => c._id)
-		const data = { ...details, images, categories: assignedCategories }
+		const data = {
+			...details,
+			analogs: details.analogs.replace("  ", "").split(","),
+			images,
+			categories: assignedCategories,
+		}
 		if (_id) {
 			await axios
 				.put("/api/products", {
@@ -118,6 +133,34 @@ const ProductForm = ({
 					required
 					className="input"
 				/>
+				<div className="flex flex-col gap-4 mb-4">
+					<div className="flex gap-2 items-center">
+						<label htmlFor="article">Article: </label>
+						<input
+							type="text"
+							name="article"
+							id="article"
+							placeholder="Enter article number"
+							value={details.article}
+							onChange={(e) => inputChangeHandler(e)}
+							required
+							className="input w-full !mb-0"
+						/>
+					</div>
+					<div className="flex gap-2 items-center">
+						<label htmlFor="analogs">Analogs: </label>
+						<input
+							type="text"
+							name="analogs"
+							id="analogs"
+							placeholder="Coma separated **,**"
+							value={details.analogs}
+							onChange={(e) => inputChangeHandler(e)}
+							required
+							className="input w-full !mb-0"
+						/>
+					</div>
+				</div>
 				<label htmlFor="categories">Categories</label>
 				<Select
 					required
