@@ -19,4 +19,5 @@ export interface IProduct {
 	images: string[]
 	_id: string
 	__v: number
+	[key: string]: any
 }

@@ -7,15 +7,55 @@ import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useState } from "react"
+import {
+	TrashIcon,
+	PencilIcon,
+	ChevronUpIcon,
+	ChevronDownIcon,
+	ChevronUpDownIcon,
+} from "@heroicons/react/24/outline"
 
 const ProductsPage = () => {
 	const { status } = useSession()
+	const router = useRouter()
+
 	const [isLoading, setIsLoading] = useState(false)
 	const [products, setProducts] = useState<IProduct[]>([])
 	const [showModal, setShowModal] = useState(false)
 	const [modalData, setModalData] = useState<IProduct>()
-	const router = useRouter()
+	const [order, setOrder] = useState<string>("asc")
+	const [sortField, setSortField] = useState<string>("")
+
 	const signedIn = status === "authenticated"
+
+	const handleSortingChange = (accessor: string) => {
+		const sortOrder = accessor === sortField && order === "asc" ? "desc" : "asc"
+		setOrder(sortOrder)
+		setSortField(accessor)
+		if (accessor) {
+			const sorted = [...products].sort((a, b) => {
+				if (a[accessor] === null) return 1
+				if (b[accessor] === null) return -1
+				if (a[accessor] === null && b[accessor] === null) return 0
+				return (
+					a[accessor].toString().localeCompare(b[accessor].toString(), "en", {
+						numeric: true,
+					}) * (sortOrder === "asc" ? 1 : -1)
+				)
+			})
+			setProducts(sorted)
+		}
+	}
+
+	const getSortIcons = (accessor: string): any => {
+		return sortField === accessor && order === "asc" ? (
+			<ChevronUpIcon className="h-6 w-6 text-white" />
+		) : sortField === accessor && order === "desc" ? (
+			<ChevronDownIcon className="h-6 w-6 text-white" />
+		) : (
+			<ChevronUpDownIcon className="h-6 w-6 text-white" />
+		)
+	}
 
 	const fetchProducts = useCallback(async () => {
 		setIsLoading(true)
@@ -33,8 +73,8 @@ const ProductsPage = () => {
 	}, [router])
 
 	useEffect(() => {
-		fetchProducts()
-	}, [fetchProducts])
+		signedIn && fetchProducts()
+	}, [fetchProducts, signedIn])
 
 	const openModalToDelete = (product: IProduct) => {
 		setModalData(product)
@@ -64,7 +104,13 @@ const ProductsPage = () => {
 								<table className="basic">
 									<thead>
 										<tr>
-											<td>Product Name</td>
+											<td
+												className="flex gap-2"
+												onClick={() => handleSortingChange("title")}
+											>
+												Product Name
+												{getSortIcons("title")}
+											</td>
 											<td>Category</td>
 											<td></td>
 										</tr>
@@ -83,39 +129,13 @@ const ProductsPage = () => {
 														className="btn btn--success !p-2"
 														href={"/products/edit/" + product._id}
 													>
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															fill="none"
-															viewBox="0 0 24 24"
-															strokeWidth="1.5"
-															stroke="currentColor"
-															className="w-6 h-6"
-														>
-															<path
-																strokeLinecap="round"
-																strokeLinejoin="round"
-																d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
-															/>
-														</svg>
+														<PencilIcon className="w-6 h-6" />
 													</Link>
 													<button
 														onClick={() => openModalToDelete(product)}
 														className="btn btn--danger !p-2"
 													>
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															fill="none"
-															viewBox="0 0 24 24"
-															strokeWidth="1.5"
-															stroke="currentColor"
-															className="w-6 h-6"
-														>
-															<path
-																strokeLinecap="round"
-																strokeLinejoin="round"
-																d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-															/>
-														</svg>
+														<TrashIcon className="w-6 h-6" />
 													</button>
 												</td>
 											</tr>

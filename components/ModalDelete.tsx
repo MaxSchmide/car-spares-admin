@@ -23,14 +23,12 @@ function ModalDelete({
 	admin,
 }: ModalProps) {
 	const [isBrowser, setIsBrowser] = useState(false)
+
 	const title = product
 		? product.title
 		: category
 		? category?.label
 		: admin?.email
-	useEffect(() => {
-		setIsBrowser(true)
-	}, [])
 
 	const handleCloseClick = (e: React.MouseEvent) => {
 		e.preventDefault()
@@ -41,6 +39,10 @@ function ModalDelete({
 		onDelete()
 		onClose()
 	}
+	
+	useEffect(() => {
+		setIsBrowser(true)
+	}, [])
 
 	const modalContent = show ? (
 		<div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50  duration-100 z-0">

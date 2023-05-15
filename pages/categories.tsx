@@ -3,6 +3,11 @@ import ModalDelete from "@/components/ModalDelete"
 import { Spinner } from "@/components/Spinner"
 import { ICategory } from "@/models/category.model"
 import { CategoriesPageSelectStyle } from "@/utils/main"
+import {
+	ChevronDownIcon,
+	ChevronUpDownIcon,
+	ChevronUpIcon,
+} from "@heroicons/react/24/outline"
 import axios from "axios"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/router"
@@ -12,6 +17,9 @@ import Select, { SingleValue } from "react-select"
 import makeAnimated from "react-select/animated"
 
 const CategoriesPage = () => {
+	const router = useRouter()
+	const { status } = useSession()
+
 	const [categories, setCategories] = useState<ICategory[]>([])
 	const [isFetching, setIsFetching] = useState(false)
 	const [isPending, setIsPending] = useState(false)
@@ -21,10 +29,40 @@ const CategoriesPage = () => {
 	const [modalData, setModalData] = useState<ICategory>()
 	const [showModal, setShowModal] = useState(false)
 	const [categoryTitle, setCategoryTitle] = useState("")
-	const router = useRouter()
+	const [order, setOrder] = useState<string>("asc")
+	const [sortField, setSortField] = useState<string>("")
+
 	const animatedComponents = makeAnimated()
-	const { status } = useSession()
 	const signedIn = status === "authenticated"
+
+	const handleSortingChange = (accessor: string) => {
+		const sortOrder = accessor === sortField && order === "asc" ? "desc" : "asc"
+		setOrder(sortOrder)
+		setSortField(accessor)
+		if (accessor) {
+			const sorted = [...categories].sort((a, b) => {
+				if (a[accessor] === null) return 1
+				if (b[accessor] === null) return -1
+				if (a[accessor] === null && b[accessor] === null) return 0
+				return (
+					a[accessor].toString().localeCompare(b[accessor].toString(), "en", {
+						numeric: true,
+					}) * (sortOrder === "asc" ? 1 : -1)
+				)
+			})
+			setCategories(sorted)
+		}
+	}
+
+	const getSortIcons = (accessor: string): any => {
+		return sortField === accessor && order === "asc" ? (
+			<ChevronUpIcon className="h-6 w-6 text-white" />
+		) : sortField === accessor && order === "desc" ? (
+			<ChevronDownIcon className="h-6 w-6 text-white" />
+		) : (
+			<ChevronUpDownIcon className="h-6 w-6 text-white" />
+		)
+	}
 
 	const selectCategory = (e: SingleValue<ICategory>) => {
 		setSelectedCategory(e)
@@ -55,6 +93,7 @@ const CategoriesPage = () => {
 			setIsPending(false)
 			toast.success("Added")
 		})
+		fetchCategories()
 	}
 
 	const fetchCategories = useCallback(async () => {
@@ -73,8 +112,8 @@ const CategoriesPage = () => {
 	}, [router])
 
 	useEffect(() => {
-		fetchCategories()
-	}, [isPending, fetchCategories])
+		signedIn && fetchCategories()
+	}, [fetchCategories, signedIn])
 
 	return (
 		<>
@@ -132,7 +171,13 @@ const CategoriesPage = () => {
 								<table className="basic">
 									<thead>
 										<tr>
-											<td>Name</td>
+											<td
+												className="flex gap-2"
+												onClick={() => handleSortingChange("label")}
+											>
+												Name
+												{getSortIcons("label")}
+											</td>
 											<td>Parent category</td>
 											<td></td>
 										</tr>
