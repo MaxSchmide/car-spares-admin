@@ -48,5 +48,5 @@ export const isAdminRequest = async (
 const findInAdminList = async (user?: User) => {
 	await mongooseConnect()
 	const admin = await Admin.findOne({ email: user?.email })
-	return admin
+	return admin ? admin : { email: null, role: null }
 }
