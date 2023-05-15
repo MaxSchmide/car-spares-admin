@@ -61,7 +61,6 @@ const ProductForm = ({
 
 	const selectCategories = (e: MultiValue<ICategory>) => {
 		setSelectedCategories(e.map((c) => c))
-		console.log(images)
 	}
 
 	const fetchCategories = async () => {
@@ -77,17 +76,22 @@ const ProductForm = ({
 			for (const file of files) {
 				data.append("file", file)
 			}
-			const res = await axios.post("/api/upload", data)
-			setImages((prev) => {
-				return [...prev, ...res.data.links]
+			await axios.post("/api/upload", data).then((res) => {
+				setImages((prev) => {
+					return [
+						...prev,
+						...res.data.links.map((link: string) => ({ id: link, src: link })),
+					]
+				})
+				setIsUploading(false)
 			})
-			setIsUploading(false)
 		}
 	}
 
 	const deleteImage = async (img: string) => {
-		const res = await axios.delete("/api/delete?id=" + img)
-		setImages((prev) => [...prev.filter((item) => item.id !== img)])
+		await axios
+			.delete("/api/delete?id=" + img)
+			.then(() => setImages((prev) => prev.filter((item) => item.id !== img)))
 	}
 
 	const inputChangeHandler = (
