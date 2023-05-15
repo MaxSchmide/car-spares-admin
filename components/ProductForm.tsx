@@ -40,7 +40,9 @@ const ProductForm = ({
 	_id,
 }: Props) => {
 	const [categories, setCategories] = useState<ICategory[]>([])
-	const [images, setImages] = useState<string[]>(productImages || [])
+	const [images, setImages] = useState(
+		productImages?.map((image) => ({ id: image, src: image })) || []
+	)
 	const [selectedCategories, setSelectedCategories] = useState<ICategory[]>(
 		productCategories || []
 	)
@@ -59,6 +61,7 @@ const ProductForm = ({
 
 	const selectCategories = (e: MultiValue<ICategory>) => {
 		setSelectedCategories(e.map((c) => c))
+		console.log(images)
 	}
 
 	const fetchCategories = async () => {
@@ -84,7 +87,7 @@ const ProductForm = ({
 
 	const deleteImage = async (img: string) => {
 		const res = await axios.delete("/api/delete?id=" + img)
-		setImages((prev) => [...prev.filter((item) => item !== img)])
+		setImages((prev) => [...prev.filter((item) => item.id !== img)])
 	}
 
 	const inputChangeHandler = (
@@ -99,10 +102,11 @@ const ProductForm = ({
 		e.preventDefault()
 		setIsLoading(true)
 		const assignedCategories = selectedCategories.map((c) => c._id)
+		const assignedImages = images.map((image) => image.src)
 		const data = {
 			...details,
 			analogs: details?.analogs?.split(","),
-			images,
+			images: assignedImages,
 			categories: assignedCategories,
 		}
 		if (_id) {
@@ -203,17 +207,17 @@ const ProductForm = ({
 						>
 							{images.map((img) => (
 								<div
-									key={img}
+									key={img.id}
 									className="relative group"
 								>
 									<img
-										src={img}
+										src={img.src}
 										alt="product image"
 										className="mobile:w-[8rem] mobile:h-[8rem] w-[10rem] h-[10rem] object-cover rounded-md shadow-md group-hover:brightness-50"
 									/>
 									<span
 										className="absolute cursor-pointer top-1 right-1 inline-block -translate-y-10 duration-200 opacity-0 mobile:translate-y-0 mobile:opacity-100 group-hover:translate-y-0 group-hover:opacity-100"
-										onClick={() => deleteImage(img)}
+										onClick={() => deleteImage(img.id)}
 									>
 										<XMarkIcon className="w-6 h-6 text-white" />
 									</span>
