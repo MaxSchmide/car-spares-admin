@@ -71,7 +71,7 @@ const CategoriesPage = () => {
 	}
 
 	const deleteCategory = async () => {
-		await axios.delete("/api/categories?_id=" + modalData?._id)
+		await axios.delete("/api/categories?id=" + modalData?._id)
 		fetchCategories()
 	}
 
