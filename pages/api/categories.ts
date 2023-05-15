@@ -27,8 +27,10 @@ export default async function handle(
 				res.json(categoryDoc)
 				break
 			case "DELETE":
-				await Category.deleteOne({ _id: req.query?.id })
-				res.status(200)
+				if (req.query.id) {
+					await Category.deleteOne({ _id: req.query?.id })
+					res.status(200).json(true)
+				}
 			default:
 				res.status(400).json({ message: "Invalid request" })
 		}
