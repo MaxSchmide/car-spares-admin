@@ -23,7 +23,6 @@ export const authOptions: AuthOptions = {
 		signIn: "/auth/signin",
 		error: "/auth/error",
 	},
-	secret: process.env.NEXTAUTH_SECRET,
 	callbacks: {
 		signIn: async ({ user }) => {
 			const { email } = await findInAdminList(user)
