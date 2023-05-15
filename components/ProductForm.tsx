@@ -82,12 +82,11 @@ const ProductForm = ({
 
 	const saveProduct = async (e: React.FormEvent) => {
 		e.preventDefault()
-		console.log(details.analogs.split(","))
 		setIsLoading(true)
 		const assignedCategories = selectedCategories.map((c) => c._id)
 		const data = {
 			...details,
-			analogs: details.analogs.replace("  ", "").split(","),
+			analogs: details.analogs.split(","),
 			images,
 			categories: assignedCategories,
 		}
