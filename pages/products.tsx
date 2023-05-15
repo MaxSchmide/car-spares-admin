@@ -101,7 +101,7 @@ const ProductsPage = () => {
 					<main>
 						{!isLoading ? (
 							products.length ? (
-								<table className="basic">
+								<table className="basic ">
 									<thead>
 										<tr>
 											<td
@@ -111,7 +111,7 @@ const ProductsPage = () => {
 												Product Name
 												{getSortIcons("title")}
 											</td>
-											<td>Category</td>
+											<td className="mobile:hidden">Category</td>
 											<td></td>
 										</tr>
 									</thead>
@@ -119,7 +119,7 @@ const ProductsPage = () => {
 										{products.map((product) => (
 											<tr key={product._id}>
 												<td className="w-3/4">{product.title}</td>
-												<td className="w-1/4">
+												<td className="w-1/4 mobile:hidden">
 													{product.categories.map((category) => (
 														<p key={category._id}>{category.label}</p>
 													))}

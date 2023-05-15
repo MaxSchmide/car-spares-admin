@@ -37,8 +37,13 @@ const ProductForm = ({
 	const [isUploading, setIsUploading] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
 	const [details, setDetails] = useState(
-		{ title, description, price, article, analogs: productAnalogs.join(",") } ||
-			initialState
+		{
+			title,
+			description,
+			price,
+			article,
+			analogs: productAnalogs?.join(","),
+		} || initialState
 	)
 	const animatedComponents = makeAnimated()
 
@@ -179,10 +184,10 @@ const ProductForm = ({
 					value={details.description}
 					onChange={(e) => inputChangeHandler(e)}
 				/>
-				<div className="flex flex-wrap gap-4">
+				<div className="flex flex-wrap gap-4 mobile:justify-center">
 					{!!images.length && (
 						<ReactSortable
-							className="flex flex-wrap gap-4"
+							className="flex flex-wrap gap-4 mobile:justify-center"
 							list={images}
 							setList={setImages}
 						>
@@ -194,10 +199,10 @@ const ProductForm = ({
 									<img
 										src={img}
 										alt="product image"
-										className="w-[10rem] h-[10rem] object-cover rounded-md shadow-md group-hover:brightness-50"
+										className="mobile:w-[8rem] mobile:h-[8rem] w-[10rem] h-[10rem] object-cover rounded-md shadow-md group-hover:brightness-50"
 									/>
 									<span
-										className="absolute cursor-pointer top-1 right-1 inline-block -translate-y-10 duration-200 opacity-0 group-hover:translate-y-0 group-hover:opacity-100"
+										className="absolute cursor-pointer top-1 right-1 inline-block -translate-y-10 duration-200 opacity-0 mobile:translate-y-0 mobile:opacity-100 group-hover:translate-y-0 group-hover:opacity-100"
 										onClick={() => deleteImage(img)}
 									>
 										<XMarkIcon className="w-6 h-6 text-white" />
@@ -213,9 +218,9 @@ const ProductForm = ({
 					)}
 					<label
 						htmlFor="photos"
-						className="hover:border-secondaryTint duration-200 bg-transparent w-fit flex flex-col gap-4  items-center border-grey2 border-2 px-8 py-10 rounded-md shadow-md"
+						className="hover:border-secondaryTint duration-200 bg-transparent w-fit flex flex-col gap-4  items-center border-grey2 border-2 px-8 py-10 rounded-md shadow-md mobile:px-4 mobile:py-4"
 					>
-						<DocumentArrowUpIcon className="w-10 h-10 text-secondary" />
+						<DocumentArrowUpIcon className="w-10 h-10  text-secondary" />
 						Upload photos
 						<input
 							className="hidden"
@@ -241,7 +246,7 @@ const ProductForm = ({
 				{isLoading ? (
 					<button
 						type="submit"
-						className="w-1/5 flex items-center justify-center btn btn--load"
+						className="w-1/5 mobile:w-full flex items-center justify-center btn btn--load"
 						disabled
 					>
 						<Spinner />
@@ -249,7 +254,7 @@ const ProductForm = ({
 				) : (
 					<button
 						type="submit"
-						className="w-1/5 btn btn--secondary"
+						className="w-1/5 mobile:w-full btn btn--secondary"
 					>
 						SAVE
 					</button>
