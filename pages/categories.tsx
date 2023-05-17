@@ -38,13 +38,21 @@ const CategoriesPage = () => {
 	const animatedComponents = makeAnimated()
 	const signedIn = status === "authenticated"
 	const engLanguage = locale === "en"
-	const title = editedCategory
-		? engLanguage
-			? `Edit category: ${(<b>{editedCategory.label}</b>)}`
-			: `Изменить категорию: ${(<b>{editedCategory.label}</b>)}`
-		: engLanguage
-		? "Add new category"
-		: "Добавить категорию"
+	const title = editedCategory ? (
+		engLanguage ? (
+			<>
+				Edit category: <strong>{editedCategory.label}</strong>
+			</>
+		) : (
+			<>
+				Изменить категорию: <strong>{editedCategory.label}</strong>
+			</>
+		)
+	) : engLanguage ? (
+		"Add new category"
+	) : (
+		"Добавить категорию"
+	)
 
 	const handleSortingChange = (accessor: string) => {
 		const sortOrder = accessor === sortField && order === "asc" ? "desc" : "asc"
