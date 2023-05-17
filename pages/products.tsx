@@ -14,6 +14,7 @@ import {
 	ChevronDownIcon,
 	ChevronUpDownIcon,
 } from "@heroicons/react/24/outline"
+import { toast } from "react-hot-toast"
 
 const ProductsPage = () => {
 	const { status } = useSession()
@@ -79,7 +80,14 @@ const ProductsPage = () => {
 	}
 
 	const deleteProduct = async () => {
-		await axios.delete("/api/products?id=" + modalData?._id)
+		await axios.delete("/api/products?id=" + modalData?._id).catch((e) => {
+			console.log(e)
+			toast.error(
+				engLanguage
+					? "Something went wrong! Please try again"
+					: "Что-то пошло не так... Попробуйте снова"
+			)
+		})
 		fetchProducts()
 	}
 

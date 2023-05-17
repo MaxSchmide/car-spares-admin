@@ -80,7 +80,14 @@ const CategoriesPage = () => {
 	}
 
 	const deleteCategory = async () => {
-		await axios.delete("/api/categories?id=" + modalData?._id)
+		await axios.delete("/api/categories?id=" + modalData?._id).catch((e) => {
+			console.log(e)
+			toast.error(
+				engLanguage
+					? "Something went wrong! Please try again"
+					: "Что-то пошло не так... Попробуйте снова"
+			)
+		})
 		fetchCategories()
 	}
 
@@ -96,7 +103,7 @@ const CategoriesPage = () => {
 		window.scrollTo({ top: 0, behavior: "smooth" })
 	}
 
-	const cancelEditingCategory = () => {
+	const cleanCategoryForm = () => {
 		setEditedCategory(null)
 		setCategoryTitle("")
 		setSelectedCategory(null)
@@ -115,8 +122,7 @@ const CategoriesPage = () => {
 			? await axios
 					.put("/api/categories", { ...data, _id: editedCategory._id })
 					.then(() => {
-						setSelectedCategory(null)
-						setCategoryTitle("")
+						cleanCategoryForm()
 						setIsPending(false)
 						toast.success(engLanguage ? "Edited" : "Изменено")
 					})
@@ -129,8 +135,7 @@ const CategoriesPage = () => {
 			: await axios
 					.post("/api/categories", data)
 					.then(() => {
-						setSelectedCategory(null)
-						setCategoryTitle("")
+						cleanCategoryForm()
 						setIsPending(false)
 						toast.success(engLanguage ? "Added" : "Добавлено")
 					})
@@ -215,7 +220,7 @@ const CategoriesPage = () => {
 							>
 								{editedCategory && (
 									<button
-										onClick={cancelEditingCategory}
+										onClick={cleanCategoryForm}
 										type="button"
 										className="w-1/2 btn btn--primary"
 									>
