@@ -40,8 +40,8 @@ const CategoriesPage = () => {
 	const engLanguage = locale === "en"
 	const title = editedCategory
 		? engLanguage
-			? `Edit category: ${editedCategory.label}`
-			: `Изменить категорию: ${editedCategory.label}`
+			? `Edit category: ${(<b>{editedCategory.label}</b>)}`
+			: `Изменить категорию: ${(<b>{editedCategory.label}</b>)}`
 		: engLanguage
 		? "Add new category"
 		: "Добавить категорию"

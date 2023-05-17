@@ -1,0 +1,1 @@
+### Make props for categories
