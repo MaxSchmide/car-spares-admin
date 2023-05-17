@@ -5,12 +5,18 @@ import { useEffect } from "react"
 
 const OrdersPage = () => {
 	const { status } = useSession()
-	const router = useRouter()
+	const { push, locale } = useRouter()
+
 	const signedIn = status === "authenticated"
+	const engLanguage = locale === "en"
+
 	useEffect(() => {
-		!signedIn && router.push("auth/error?error=AccessDenied")
-	}, [signedIn, router])
-	return <>{signedIn && <Layout> Orders</Layout>}</>
+		!signedIn && push("auth/error?error=AccessDenied")
+	}, [signedIn, push])
+
+	return (
+		<>{signedIn && <Layout> {engLanguage ? "Orders" : "Заказы"}</Layout>}</>
+	)
 }
 
 export default OrdersPage

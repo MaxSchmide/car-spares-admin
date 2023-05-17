@@ -1,15 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
+import { ICategory } from "@/models/category.model"
 import { ProductPageSelectStyle } from "@/utils/main"
+import { DocumentArrowUpIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import axios from "axios"
+import { useRouter } from "next/router"
 import React, { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
 import Select, { MultiValue } from "react-select"
 import makeAnimated from "react-select/animated"
 import { ReactSortable } from "react-sortablejs"
 import { Spinner } from "./Spinner"
-import { ICategory } from "@/models/category.model"
-import { XMarkIcon, DocumentArrowUpIcon } from "@heroicons/react/24/outline"
-import { IProduct } from "@/models/product.model"
 
 const initialState = {
 	title: "",
@@ -39,6 +39,8 @@ const ProductForm = ({
 	analogs: productAnalogs,
 	_id,
 }: Props) => {
+	const { push, locale } = useRouter()
+
 	const [categories, setCategories] = useState<ICategory[]>([])
 	const [images, setImages] = useState(
 		productImages?.map((image) => ({ id: image, src: image })) || []
@@ -57,6 +59,9 @@ const ProductForm = ({
 			analogs: productAnalogs?.join(","),
 		} || initialState
 	)
+
+	const engLanguage = locale === "en"
+
 	const animatedComponents = makeAnimated()
 
 	const selectCategories = (e: MultiValue<ICategory>) => {
@@ -120,12 +125,13 @@ const ProductForm = ({
 					_id,
 				})
 				.then(() => {
-					toast.success("Edited")
+					toast.success(engLanguage ? "Edited" : "Изменено")
 					setIsLoading(false)
+					push("/products", "/products", { locale })
 				})
 		} else {
 			await axios.post("/api/products", data).then(() => {
-				toast.success("Added")
+				toast.success(engLanguage ? "Added" : "Добавлено")
 				setSelectedCategories([])
 				setImages([])
 				setDetails(initialState)
@@ -144,12 +150,14 @@ const ProductForm = ({
 				onSubmit={(e) => saveProduct(e)}
 				className="flex flex-col gap-4"
 			>
-				<label htmlFor="title">Product Name</label>
+				<label htmlFor="title">
+					{engLanguage ? "Product name" : "Название товара"}
+				</label>
 				<input
 					type="text"
 					name="title"
 					id="title"
-					placeholder="Enter title"
+					placeholder={engLanguage ? "Enter title" : "Введите название"}
 					value={details.title}
 					onChange={(e) => inputChangeHandler(e)}
 					required
@@ -157,12 +165,16 @@ const ProductForm = ({
 				/>
 				<div className="flex flex-col gap-4 mb-4">
 					<div className="flex gap-2 items-center">
-						<label htmlFor="article">Article: </label>
+						<label htmlFor="article">
+							{engLanguage ? "Article:" : "Артикль:"}
+						</label>
 						<input
 							type="text"
 							name="article"
 							id="article"
-							placeholder="Enter article number"
+							placeholder={
+								engLanguage ? "Enter article number" : "Введите номер"
+							}
 							value={details.article}
 							onChange={(e) => inputChangeHandler(e)}
 							required
@@ -170,12 +182,14 @@ const ProductForm = ({
 						/>
 					</div>
 					<div className="flex gap-2 items-center">
-						<label htmlFor="analogs">Analogs: </label>
+						<label htmlFor="analogs">
+							{engLanguage ? "Analogs:" : "Аналоги:"}
+						</label>
 						<input
 							type="text"
 							name="analogs"
 							id="analogs"
-							placeholder="Coma separated **,**"
+							placeholder={engLanguage ? "Coma separated" : "Через запятую"}
 							value={details.analogs}
 							onChange={(e) => inputChangeHandler(e)}
 							required
@@ -183,8 +197,11 @@ const ProductForm = ({
 						/>
 					</div>
 				</div>
-				<label htmlFor="categories">Categories</label>
+				<label htmlFor="categories">
+					{engLanguage ? "Categories" : "Категории"}
+				</label>
 				<Select
+					placeholder={engLanguage ? "Select categories" : "Выберите категории"}
 					required
 					options={categories.map((c) => ({ ...c, value: c._id }))}
 					styles={ProductPageSelectStyle}
@@ -194,11 +211,13 @@ const ProductForm = ({
 					isMulti
 					onChange={(e) => selectCategories(e)}
 				/>
-				<label htmlFor="description">Product Description</label>
+				<label htmlFor="description">
+					{engLanguage ? "Product Description" : "Описание товара"}
+				</label>
 				<textarea
 					name="description"
 					id="description"
-					placeholder="Optional"
+					placeholder={engLanguage ? "(Optional)" : "(Дополнительно)"}
 					value={details.description}
 					onChange={(e) => inputChangeHandler(e)}
 				/>
@@ -239,7 +258,7 @@ const ProductForm = ({
 						className="hover:border-secondaryTint duration-200 bg-transparent w-fit flex flex-col gap-4  items-center border-grey2 border-2 px-8 py-10 rounded-md shadow-md mobile:px-4 mobile:py-4"
 					>
 						<DocumentArrowUpIcon className="w-10 h-10  text-secondary" />
-						Upload photos
+						{engLanguage ? "Upload photos" : "Загрузите фото"}
 						<input
 							className="hidden"
 							type="file"
@@ -250,7 +269,9 @@ const ProductForm = ({
 						/>
 					</label>
 				</div>
-				<label htmlFor="price">Product Price</label>
+				<label htmlFor="price">
+					{engLanguage ? "Product Price" : "Цена товара"}
+				</label>
 				<input
 					type="number"
 					name="price"
@@ -274,7 +295,7 @@ const ProductForm = ({
 						type="submit"
 						className="w-1/5 mobile:w-full btn btn--secondary"
 					>
-						SAVE
+						{engLanguage ? "SAVE" : "ГОТОВО"}
 					</button>
 				)}
 			</form>

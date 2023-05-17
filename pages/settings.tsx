@@ -2,17 +2,16 @@ import Layout from "@/components/Layout"
 import ModalDelete from "@/components/ModalDelete"
 import { Spinner } from "@/components/Spinner"
 import { IAdmin } from "@/models/admin.model"
+import { TrashIcon } from "@heroicons/react/24/outline"
 import axios from "axios"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/router"
 import React, { useCallback, useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
-import { TrashIcon } from "@heroicons/react/24/outline"
-import { traceDeprecation } from "process"
 
 const SettingPage = () => {
 	const { data: session, status } = useSession()
-	const router = useRouter()
+	const { push, locale } = useRouter()
 
 	const [adminEmail, setAdminEmail] = useState("")
 	const [admins, setAdmins] = useState<IAdmin[]>([])
@@ -21,6 +20,7 @@ const SettingPage = () => {
 	const [isPending, setIsPending] = useState(false)
 
 	const signedIn = status === "authenticated"
+	const engLanguage = locale === "en"
 
 	const addAdmin = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
@@ -29,7 +29,7 @@ const SettingPage = () => {
 		await axios.post("/api/admins", data).then(() => {
 			setAdminEmail("")
 			setIsPending(false)
-			toast.success("Added")
+			toast.success(engLanguage ? "Added" : "Добавлено")
 		})
 		fetchAdmins()
 	}
@@ -50,10 +50,12 @@ const SettingPage = () => {
 			.then((res) => setAdmins(res.data))
 			.catch((e) => {
 				e.response.status === 403
-					? router.push("auth/error?error=AccessDenied")
-					: console.log(e)
+					? push("auth/error?error=AccessDenied")
+					: toast.error(
+							engLanguage ? "Something went wrong" : "Что-то пошло не так"
+					  )
 			})
-	}, [router])
+	}, [push, engLanguage])
 
 	useEffect(() => {
 		signedIn && fetchAdmins()
@@ -65,7 +67,9 @@ const SettingPage = () => {
 				<Layout>
 					{session?.user.role === "owner" && (
 						<>
-							<h1 className="mb-2 text-2xl"> Add new Admin</h1>
+							<h1 className="mb-2 text-2xl">
+								{engLanguage ? "Add new Admin" : "Добавить Админа"}
+							</h1>
 							<form
 								onSubmit={addAdmin}
 								className="flex gap-2 items-center mb-24 mobile:flex-col mobile:gap-4 mobile:mb-12"
@@ -91,18 +95,20 @@ const SettingPage = () => {
 										type="submit"
 										className=" mobile:w-1/3 btn btn--secondary"
 									>
-										Save
+										{engLanguage ? "Save" : "Готово"}
 									</button>
 								)}
 							</form>
 						</>
 					)}
-					<h1 className="mb-4 text-2xl">Admins</h1>
+					<h1 className="mb-4 text-2xl">{engLanguage ? "Admins" : "Админы"}</h1>
 					<table className="basic">
 						<thead>
 							<tr>
 								<td>E-mail</td>
-								<td className="mobile:hidden">Role</td>
+								<td className="mobile:hidden">
+									{engLanguage ? "Role" : "Статус"}
+								</td>
 								{session?.user.role === "owner" && <td></td>}
 							</tr>
 						</thead>

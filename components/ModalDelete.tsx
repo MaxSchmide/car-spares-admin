@@ -1,7 +1,7 @@
 import { IAdmin } from "@/models/admin.model"
 import { ICategory } from "@/models/category.model"
 import { IProduct } from "@/models/product.model"
-import axios from "axios"
+import { useRouter } from "next/router"
 import React, { useEffect, useState } from "react"
 import ReactDOM from "react-dom"
 
@@ -22,7 +22,11 @@ function ModalDelete({
 	category,
 	admin,
 }: ModalProps) {
+	const { locale } = useRouter()
+
 	const [isBrowser, setIsBrowser] = useState(false)
+
+	const engLanguage = locale === "en"
 
 	const title = product
 		? product.title
@@ -39,7 +43,7 @@ function ModalDelete({
 		onDelete()
 		onClose()
 	}
-	
+
 	useEffect(() => {
 		setIsBrowser(true)
 	}, [])
@@ -52,9 +56,11 @@ function ModalDelete({
 					className="text-center mb-8"
 				>
 					<h1>
-						You want to delete: <b>{title}</b>
+						{engLanguage ? "You want to delete:" : "Вы хотите удалить:"}
+						&nbsp;
+						<b>{title}</b>
 					</h1>
-					<p>Are you sure?</p>
+					<p> {engLanguage ? "Are you sure?" : "Вы уверены?"}</p>
 				</div>
 				<div
 					id="body"
@@ -64,13 +70,13 @@ function ModalDelete({
 						className="btn btn--danger"
 						onClick={deleteData}
 					>
-						Yes
+						{engLanguage ? "Yes" : "Да"}
 					</button>
 					<button
 						onClick={handleCloseClick}
 						className="btn btn--primary"
 					>
-						No
+						{engLanguage ? "No" : "Нет"}
 					</button>
 				</div>
 			</div>

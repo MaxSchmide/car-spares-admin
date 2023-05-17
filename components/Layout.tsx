@@ -1,6 +1,5 @@
 import Header from "@/components/Header"
 import Sidebar from "@/components/Sidebar"
-import { useSession, signIn } from "next-auth/react"
 import { useState } from "react"
 
 type LayoutProps = {
@@ -9,7 +8,9 @@ type LayoutProps = {
 
 export default function Layout({ children }: LayoutProps) {
 	const [showSidebar, setShowSidebar] = useState(false)
+
 	const handleShowSidebar = () => setShowSidebar(!showSidebar)
+
 	return (
 		<>
 			<Header

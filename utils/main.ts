@@ -92,3 +92,28 @@ export const CategoriesPageSelectStyle: StylesConfig<
 		}
 	},
 }
+
+export const HeaderSelectStyle: StylesConfig<
+	{ value: string; label: string },
+	false,
+	GroupBase<{ value: string; label: string }>
+> = {
+	container: (styles) => ({ ...styles }),
+	option: (styles, { isSelected, isFocused }) => ({
+		...styles,
+		color: isSelected ? "white" : "#111827",
+		backgroundColor: isSelected ? "#111827" : isFocused ? "#e4e6eb" : "white",
+		":active": {
+			backgroundColor: "#e4e6eb",
+		},
+	}),
+	singleValue: (styles) => ({ ...styles, color: "white" }),
+	control: (styles, { menuIsOpen }) => ({
+		...styles,
+		background: "transparent",
+		":hover": {
+			boxShadow: " 0 0 0 1px #4940E5",
+			borderColor: "#4940E5",
+		},
+	}),
+}

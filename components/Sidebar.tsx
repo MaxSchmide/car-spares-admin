@@ -15,7 +15,9 @@ type Props = {
 }
 
 const Sidebar = ({ isShow, show }: Props) => {
-	const { pathname } = useRouter()
+	const { pathname, locale } = useRouter()
+
+	const engLanguage = locale === "en"
 
 	const inactiveLink =
 		"flex gap-1 p-4 pl-8 hover:bg-primaryTint hover:text-white"
@@ -32,45 +34,50 @@ const Sidebar = ({ isShow, show }: Props) => {
 			>
 				<nav className="flex flex-col gap-4">
 					<Link
+						locale={locale}
 						href="/"
 						className={pathname === "/" ? activeLink : inactiveLink}
 					>
 						<CircleStackIcon className="w-6 h-6" />
-						Dashboard
+						{engLanguage ? "Dashboard" : "Статистика"}
 					</Link>
 					<Link
+						locale={locale}
 						href="/orders"
 						className={pathname.includes("/orders") ? activeLink : inactiveLink}
 					>
 						<CreditCardIcon className="w-6 h-6" />
-						Orders
+						{engLanguage ? "Orders" : "Заказы"}
 					</Link>
 					<Link
+						locale={locale}
 						href="/products"
 						className={
 							pathname.includes("/products") ? activeLink : inactiveLink
 						}
 					>
 						<ListBulletIcon className="w-6 h-6" />
-						Products
+						{engLanguage ? "Products" : "Товары"}
 					</Link>
 					<Link
+						locale={locale}
 						href="/categories"
 						className={
 							pathname.includes("/categories") ? activeLink : inactiveLink
 						}
 					>
 						<QueueListIcon className="h-6 w-6" />
-						Categories
+						{engLanguage ? "Categories" : "Категории"}
 					</Link>
 					<Link
+						locale={locale}
 						href="/settings"
 						className={
 							pathname.includes("/settings") ? activeLink : inactiveLink
 						}
 					>
 						<Cog6ToothIcon className="w-6 h-6" />
-						Settings
+						{engLanguage ? "Settings" : "Настройки"}
 					</Link>
 				</nav>
 			</aside>

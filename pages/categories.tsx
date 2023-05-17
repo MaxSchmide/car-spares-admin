@@ -19,7 +19,7 @@ import Select, { SingleValue } from "react-select"
 import makeAnimated from "react-select/animated"
 
 const CategoriesPage = () => {
-	const router = useRouter()
+	const { push, locale } = useRouter()
 	const { status } = useSession()
 
 	const [categories, setCategories] = useState<ICategory[]>([])
@@ -31,11 +31,20 @@ const CategoriesPage = () => {
 	const [modalData, setModalData] = useState<ICategory>()
 	const [showModal, setShowModal] = useState(false)
 	const [categoryTitle, setCategoryTitle] = useState("")
+	const [editedCategory, setEditedCategory] = useState<ICategory | null>(null)
 	const [order, setOrder] = useState<string>("asc")
 	const [sortField, setSortField] = useState<string>("")
 
 	const animatedComponents = makeAnimated()
 	const signedIn = status === "authenticated"
+	const engLanguage = locale === "en"
+	const title = editedCategory
+		? engLanguage
+			? `Edit category: ${editedCategory.label}`
+			: `Изменить категорию: ${editedCategory.label}`
+		: engLanguage
+		? "Add new category"
+		: "Добавить категорию"
 
 	const handleSortingChange = (accessor: string) => {
 		const sortOrder = accessor === sortField && order === "asc" ? "desc" : "asc"
@@ -75,9 +84,22 @@ const CategoriesPage = () => {
 		fetchCategories()
 	}
 
-	const openModalToDelete = (category: ICategory) => {
-		setModalData(category)
-		setShowModal(true)
+	const editCategory = async (category: ICategory) => {
+		const parentCategory = {
+			_id: category?.parent?._id,
+			label: category?.parent?.label,
+			__v: category?.parent?.__v,
+		}
+		setEditedCategory(category)
+		setCategoryTitle(category.label)
+		setSelectedCategory(parentCategory)
+		window.scrollTo({ top: 0, behavior: "smooth" })
+	}
+
+	const cancelEditingCategory = () => {
+		setEditedCategory(null)
+		setCategoryTitle("")
+		setSelectedCategory(null)
 	}
 
 	const createCategory = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -89,13 +111,42 @@ const CategoriesPage = () => {
 			parent: selectedCategory?._id,
 		}
 
-		await axios.post("/api/categories", data).then(() => {
-			setSelectedCategory(null)
-			setCategoryTitle("")
-			setIsPending(false)
-			toast.success("Added")
-		})
+		editedCategory
+			? await axios
+					.put("/api/categories", { ...data, _id: editedCategory._id })
+					.then(() => {
+						setSelectedCategory(null)
+						setCategoryTitle("")
+						setIsPending(false)
+						toast.success(engLanguage ? "Edited" : "Изменено")
+					})
+					.catch((e) => {
+						toast.error(
+							engLanguage ? "Something went wrong" : "Что-то пошло не так..."
+						)
+						setIsPending(false)
+					})
+			: await axios
+					.post("/api/categories", data)
+					.then(() => {
+						setSelectedCategory(null)
+						setCategoryTitle("")
+						setIsPending(false)
+						toast.success(engLanguage ? "Added" : "Добавлено")
+					})
+					.catch((e) => {
+						toast.error(
+							engLanguage ? "Something went wrong" : "Что-то пошло не так..."
+						)
+						setIsPending(false)
+					})
+
 		fetchCategories()
+	}
+
+	const openModalToDelete = (category: ICategory) => {
+		setModalData(category)
+		setShowModal(true)
 	}
 
 	const fetchCategories = useCallback(async () => {
@@ -108,10 +159,10 @@ const CategoriesPage = () => {
 			})
 			.catch((e) => {
 				e.response.status === 403
-					? router.push("auth/error?error=AccessDenied")
+					? push("auth/error?error=AccessDenied")
 					: console.log(e)
 			})
-	}, [router])
+	}, [push])
 
 	useEffect(() => {
 		signedIn && fetchCategories()
@@ -123,17 +174,20 @@ const CategoriesPage = () => {
 				<Layout>
 					<main>
 						<h1 className="text-3xl mb-8 text-secondaryShade font-bold">
-							Categories
+							{engLanguage ? "Categories" : "Категории"}
 						</h1>
-						<h2 className="mb-2">Add new category</h2>
+						<h2 className="mb-2">{title}</h2>
 						<form
 							onSubmit={(e) => createCategory(e)}
 							className="mb-10 w-full flex items-center gap-8 mobile:flex-col"
 						>
 							<div className="input !py-1 !pr-0 w-full !mb-0 flex">
 								<input
-									className="bg-transparent outline-none w-3/4 mobile:w-1/2"
-									placeholder="Enter category name..."
+									required
+									className="bg-transparent  outline-none w-3/4 mobile:w-1/2"
+									placeholder={
+										engLanguage ? "Enter category name..." : "Введите название"
+									}
 									type="text"
 									id="category"
 									value={categoryTitle}
@@ -146,7 +200,7 @@ const CategoriesPage = () => {
 									components={animatedComponents}
 									styles={CategoriesPageSelectStyle}
 									value={selectedCategory}
-									placeholder="Select..."
+									placeholder={engLanguage ? "Parent..." : "Корневая..."}
 									isClearable
 									onChange={(e) => selectCategory(e)}
 									classNames={{
@@ -154,22 +208,41 @@ const CategoriesPage = () => {
 									}}
 								/>
 							</div>
-							{isPending ? (
-								<button
-									type="submit"
-									className="w-1/6 mobile:w-1/2 btn btn--load flex items-center justify-center"
-									disabled
-								>
-									<Spinner size={6} />
-								</button>
-							) : (
-								<button
-									type="submit"
-									className="w-1/6 mobile:w-1/2 btn btn--secondary"
-								>
-									Save
-								</button>
-							)}
+							<div
+								className={`w-1/6 flex mobile:!w-full mobile:justify-center ${
+									editedCategory && "flex !w-1/2 gap-2  mobile:justify-around"
+								}`}
+							>
+								{editedCategory && (
+									<button
+										onClick={cancelEditingCategory}
+										type="button"
+										className="w-1/2 btn btn--primary"
+									>
+										{engLanguage ? "Cancel" : "Отмена"}
+									</button>
+								)}
+								{isPending ? (
+									<button
+										type="submit"
+										className={`w-full ${
+											editedCategory && "!w-1/2"
+										} mobile:!w-1/2  btn btn--load flex items-center justify-center`}
+										disabled
+									>
+										<Spinner size={6} />
+									</button>
+								) : (
+									<button
+										type="submit"
+										className={`w-full ${
+											editedCategory && "!w-1/2"
+										} mobile:!w-1/2  btn btn--secondary`}
+									>
+										{engLanguage ? "Save" : "Готово"}
+									</button>
+								)}
+							</div>
 						</form>
 						{!isFetching ? (
 							categories.length ? (
@@ -180,10 +253,12 @@ const CategoriesPage = () => {
 												className="flex gap-2"
 												onClick={() => handleSortingChange("label")}
 											>
-												Name
+												{engLanguage ? "Name" : "Название"}
 												{getSortIcons("label")}
 											</td>
-											<td className="mobile:hidden">Parent category</td>
+											<td className="mobile:hidden">
+												{engLanguage ? "Parent category" : "Корневая категория"}
+											</td>
 											<td></td>
 										</tr>
 									</thead>
@@ -199,7 +274,7 @@ const CategoriesPage = () => {
 												<td className="flex w-fit gap-2 items-center">
 													<button
 														className="btn btn--success !p-2"
-														// href={"/products/edit/" + product._id}
+														onClick={() => editCategory(category)}
 													>
 														<PencilIcon className="w-6 h-6" />
 													</button>
@@ -215,7 +290,11 @@ const CategoriesPage = () => {
 									</tbody>
 								</table>
 							) : (
-								<h1>No categories are aviable</h1>
+								<h1>
+									{engLanguage
+										? "No categories are aviable"
+										: "Категорий не найдено"}
+								</h1>
 							)
 						) : (
 							<Spinner size={10} />

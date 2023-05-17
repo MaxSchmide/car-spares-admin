@@ -17,7 +17,7 @@ import {
 
 const ProductsPage = () => {
 	const { status } = useSession()
-	const router = useRouter()
+	const { push, locale } = useRouter()
 
 	const [isLoading, setIsLoading] = useState(false)
 	const [products, setProducts] = useState<IProduct[]>([])
@@ -26,6 +26,7 @@ const ProductsPage = () => {
 	const [order, setOrder] = useState<string>("asc")
 	const [sortField, setSortField] = useState<string>("")
 
+	const engLanguage = locale === "en"
 	const signedIn = status === "authenticated"
 
 	const handleSortingChange = (accessor: string) => {
@@ -67,14 +68,10 @@ const ProductsPage = () => {
 			})
 			.catch((e) => {
 				e.response.status === 403
-					? router.push("auth/error?error=AccessDenied")
+					? push("auth/error?error=AccessDenied")
 					: console.log(e)
 			})
-	}, [router])
-
-	useEffect(() => {
-		signedIn && fetchProducts()
-	}, [fetchProducts, signedIn])
+	}, [push])
 
 	const openModalToDelete = (product: IProduct) => {
 		setModalData(product)
@@ -86,16 +83,21 @@ const ProductsPage = () => {
 		fetchProducts()
 	}
 
+	useEffect(() => {
+		signedIn && fetchProducts()
+	}, [fetchProducts, signedIn])
+
 	return (
 		<>
 			{signedIn && (
 				<Layout>
 					<header className="mb-20">
 						<Link
+							locale={locale}
 							href={"/products/new"}
 							className="btn btn--secondary"
 						>
-							Add new product
+							{engLanguage ? "Add new product" : "Добавить новый"}
 						</Link>
 					</header>
 					<main>
@@ -108,10 +110,12 @@ const ProductsPage = () => {
 												className="flex gap-2"
 												onClick={() => handleSortingChange("title")}
 											>
-												Product Name
+												{engLanguage ? "Product Name" : "Название"}
 												{getSortIcons("title")}
 											</td>
-											<td className="mobile:hidden">Category</td>
+											<td className="mobile:hidden">
+												{engLanguage ? "Category" : "Категория"}
+											</td>
 											<td></td>
 										</tr>
 									</thead>
@@ -126,6 +130,7 @@ const ProductsPage = () => {
 												</td>
 												<td className="flex w-fit gap-2 items-center">
 													<Link
+														locale={locale}
 														className="btn btn--success !p-2"
 														href={"/products/edit/" + product._id}
 													>
@@ -143,7 +148,12 @@ const ProductsPage = () => {
 									</tbody>
 								</table>
 							) : (
-								<h1> No products are aviable</h1>
+								<h1>
+									{" "}
+									{engLanguage
+										? "No products are aviable"
+										: "Товары не найдены"}
+								</h1>
 							)
 						) : (
 							<Spinner size={10} />

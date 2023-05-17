@@ -6,18 +6,23 @@ import { toast } from "react-hot-toast"
 import ProductForm from "@/components/ProductForm"
 import { IProduct } from "@/models/product.model"
 const EditProduct = () => {
-	const [product, setProduct] = useState<IProduct | null>(null)
 	const {
+		locale,
 		query: { id },
 	} = useRouter()
+
+	const [product, setProduct] = useState<IProduct | null>(null)
 
 	useEffect(() => {
 		if (!id) toast.error("Failed to load product")
 		axios.get("/api/products?id=" + id).then((res) => setProduct(res.data))
 	}, [id])
+
 	return (
 		<Layout>
-			<h1 className="text-secondary mb-8 text-2xl">Edit Product</h1>
+			<h1 className="text-secondary mb-8 text-2xl">
+				{locale === "en" ? "Edit Product" : "Изменить товар"}
+			</h1>
 			{product && <ProductForm {...product} />}
 		</Layout>
 	)

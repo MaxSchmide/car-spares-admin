@@ -13,7 +13,7 @@ export default async function handle(
 
 		const {
 			method,
-			body: { label, parent },
+			body: { label, parent, _id },
 		} = req
 		switch (method) {
 			case "GET":
@@ -25,6 +25,16 @@ export default async function handle(
 					parent,
 				})
 				res.json(categoryDoc)
+				break
+			case "PUT":
+				await Category.updateOne(
+					{ _id },
+					{
+						label,
+						parent,
+					}
+				)
+				res.json(true)
 				break
 			case "DELETE":
 				if (req.query?.id) {
