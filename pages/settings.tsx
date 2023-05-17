@@ -25,7 +25,7 @@ const SettingPage = () => {
 	const addAdmin = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		setIsPending(true)
-		const data = { email: adminEmail, role: "admin" }
+		const data = { email: adminEmail.toLowerCase(), role: "admin" }
 		await axios.post("/api/admins", data).then(() => {
 			setAdminEmail("")
 			setIsPending(false)
@@ -35,7 +35,14 @@ const SettingPage = () => {
 	}
 
 	const deleteAdmin = async () => {
-		await axios.delete("/api/admins?_id=" + modalData?._id)
+		await axios.delete("/api/admins?_id=" + modalData?._id).catch((e) => {
+			console.log(e)
+			toast.error(
+				engLanguage
+					? "Something went wrong! Please try again"
+					: "Что-то пошло не так... Попробуйте снова"
+			)
+		})
 		fetchAdmins()
 	}
 

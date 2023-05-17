@@ -178,9 +178,6 @@ const CategoriesPage = () => {
 			{signedIn && (
 				<Layout>
 					<main>
-						<h1 className="text-3xl mb-8 text-secondaryShade font-bold">
-							{engLanguage ? "Categories" : "Категории"}
-						</h1>
 						<h2 className="mb-2">{title}</h2>
 						<form
 							onSubmit={(e) => createCategory(e)}
@@ -218,15 +215,6 @@ const CategoriesPage = () => {
 									editedCategory && "flex !w-1/2 gap-2  mobile:justify-around"
 								}`}
 							>
-								{editedCategory && (
-									<button
-										onClick={cleanCategoryForm}
-										type="button"
-										className="w-1/2 btn btn--primary"
-									>
-										{engLanguage ? "Cancel" : "Отмена"}
-									</button>
-								)}
 								{isPending ? (
 									<button
 										type="submit"
@@ -245,6 +233,15 @@ const CategoriesPage = () => {
 										} mobile:!w-1/2  btn btn--secondary`}
 									>
 										{engLanguage ? "Save" : "Готово"}
+									</button>
+								)}
+								{editedCategory && (
+									<button
+										onClick={cleanCategoryForm}
+										type="button"
+										className="w-1/2 btn btn--primary"
+									>
+										{engLanguage ? "Cancel" : "Отмена"}
 									</button>
 								)}
 							</div>
@@ -270,8 +267,13 @@ const CategoriesPage = () => {
 									<tbody>
 										{categories.map((category) => (
 											<tr key={category._id}>
-												<td className="w-1/2 mobile:w-full">
-													{category.label}
+												<td className="w-1/2 mobile:w-full ">
+													<span
+														className="inline-block select-none cursor-pointer"
+														onDoubleClick={() => editCategory(category)}
+													>
+														{category.label}
+													</span>
 												</td>
 												<td className="w-1/2 mobile:hidden">
 													{category.parent?.label}

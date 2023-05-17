@@ -18,6 +18,7 @@ const initialState = {
 	article: "",
 	analogs: "",
 }
+
 interface Props {
 	title?: string
 	description?: string
@@ -282,22 +283,33 @@ const ProductForm = ({
 					required
 					className="input"
 				/>
-				{isLoading ? (
-					<button
-						type="submit"
-						className="w-1/5 mobile:w-full flex items-center justify-center btn btn--load"
-						disabled
-					>
-						<Spinner />
-					</button>
-				) : (
-					<button
-						type="submit"
-						className="w-1/5 mobile:w-full btn btn--secondary"
-					>
-						{engLanguage ? "SAVE" : "ГОТОВО"}
-					</button>
-				)}
+				<div className="flex gap-8">
+					{isLoading ? (
+						<button
+							type="submit"
+							className="w-1/5 mobile:w-1/2 flex items-center justify-center btn btn--load"
+							disabled
+						>
+							<Spinner />
+						</button>
+					) : (
+						<button
+							type="submit"
+							className="w-1/5 mobile:w-1/2 btn btn--secondary"
+						>
+							{engLanguage ? "SAVE" : "ГОТОВО"}
+						</button>
+					)}
+					{details && (
+						<button
+							type="button"
+							className="w-1/6 mobile:w-1/2 btn btn--primary"
+							onClick={() => push("/products", "/products", { locale })}
+						>
+							{engLanguage ? "Cancel" : "Отмена"}
+						</button>
+					)}
+				</div>
 			</form>
 		</>
 	)

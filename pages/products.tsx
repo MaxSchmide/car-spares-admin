@@ -26,6 +26,7 @@ const ProductsPage = () => {
 	const [modalData, setModalData] = useState<IProduct>()
 	const [order, setOrder] = useState<string>("asc")
 	const [sortField, setSortField] = useState<string>("")
+	const [filterValue, setFilterValue] = useState("")
 
 	const engLanguage = locale === "en"
 	const signedIn = status === "authenticated"
@@ -103,23 +104,43 @@ const ProductsPage = () => {
 						<Link
 							locale={locale}
 							href={"/products/new"}
-							className="btn btn--secondary"
+							className="w-fit btn btn--secondary"
 						>
 							{engLanguage ? "Add new product" : "Добавить новый"}
 						</Link>
 					</header>
 					<main>
+						<input
+							type="text"
+							className="input !mb-10 w-1/3 mobile:!w-full tablet:w-1/2 "
+							placeholder={
+								engLanguage ? "Filter by category..." : "Фильтр по категориям"
+							}
+							value={filterValue}
+							onChange={(e) => setFilterValue(e.target.value)}
+						/>
 						{!isLoading ? (
 							products.length ? (
 								<table className="basic ">
 									<thead>
 										<tr>
-											<td
-												className="flex gap-2"
-												onClick={() => handleSortingChange("title")}
-											>
-												{engLanguage ? "Product Name" : "Название"}
-												{getSortIcons("title")}
+											<td>
+												<span
+													className="flex gap-2 select-none cursor-pointer"
+													onClick={() => handleSortingChange("title")}
+												>
+													{engLanguage ? "Product Name" : "Название"}
+													{getSortIcons("title")}
+												</span>
+											</td>
+											<td>
+												<span
+													className="flex gap-2 select-none cursor-pointer"
+													onClick={() => handleSortingChange("article")}
+												>
+													{engLanguage ? "Article" : "Артикль"}
+													{getSortIcons("article")}
+												</span>
 											</td>
 											<td className="mobile:hidden">
 												{engLanguage ? "Category" : "Категория"}
@@ -128,31 +149,52 @@ const ProductsPage = () => {
 										</tr>
 									</thead>
 									<tbody>
-										{products.map((product) => (
-											<tr key={product._id}>
-												<td className="w-3/4">{product.title}</td>
-												<td className="w-1/4 mobile:hidden">
-													{product.categories.map((category) => (
-														<p key={category._id}>{category.label}</p>
-													))}
-												</td>
-												<td className="flex w-fit gap-2 items-center">
-													<Link
-														locale={locale}
-														className="btn btn--success !p-2"
-														href={"/products/edit/" + product._id}
-													>
-														<PencilIcon className="w-6 h-6" />
-													</Link>
-													<button
-														onClick={() => openModalToDelete(product)}
-														className="btn btn--danger !p-2"
-													>
-														<TrashIcon className="w-6 h-6" />
-													</button>
-												</td>
-											</tr>
-										))}
+										{products
+											.filter(
+												(product) =>
+													!!product.categories.find((c) =>
+														c.label
+															.toLowerCase()
+															.includes(filterValue.toLowerCase())
+													)
+											)
+											.map((product) => (
+												<tr key={product._id}>
+													<td>
+														<span
+															className="inline-block select-none cursor-pointer"
+															onDoubleClick={() =>
+																push("/products/edit/" + product._id)
+															}
+														>
+															{product.title}
+														</span>
+													</td>
+													<td>{product.article}</td>
+													<td className="mobile:hidden">
+														{product.categories.map((category) => (
+															<p key={category._id}>{category.label}</p>
+														))}
+													</td>
+													<td>
+														<span className="flex w-fit gap-2 items-center ml-auto">
+															<Link
+																locale={locale}
+																className="btn btn--success !p-2"
+																href={"/products/edit/" + product._id}
+															>
+																<PencilIcon className="w-6 h-6" />
+															</Link>
+															<button
+																onClick={() => openModalToDelete(product)}
+																className="btn btn--danger !p-2"
+															>
+																<TrashIcon className="w-6 h-6" />
+															</button>
+														</span>
+													</td>
+												</tr>
+											))}
 									</tbody>
 								</table>
 							) : (

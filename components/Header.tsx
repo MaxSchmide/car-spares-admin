@@ -35,7 +35,7 @@ const Header = ({ isShow, show }: Props) => {
 	}
 
 	return (
-		<header className="flex min-h-[84px] justify-between p-4 items-center text-white bg-primary border-b-2 border-b-secondary z-50 tablet:fixed tablet:w-full  ">
+		<header className="flex min-h-[84px] justify-between p-4 items-center text-white bg-primary border-b-2 border-b-secondary z-50 fixed w-full  ">
 			<div className="flex gap-4 items-center">
 				<Link
 					locale={locale}
@@ -47,18 +47,20 @@ const Header = ({ isShow, show }: Props) => {
 						alt="logo"
 						className="w-12 h-12"
 					/>
-					<span className="tablet:hidden">{title}</span>
 				</Link>
 				<span
-					className="hidden tablet:block cursor-pointer"
+					className="block cursor-pointer"
 					onClick={show}
 				>
-					<Bars3Icon className="h-6 w-6 text-white" />
+					<Bars3Icon className="h-8 w-8 tablet:h-6 tablet:w-6 text-white" />
 				</span>
 			</div>
 
 			<div className="flex items-center gap-4">
-				<button onClick={logout}>
+				<button
+					onClick={logout}
+					className="hover:text-secondary hover:scale-110 duration-200 ease-in-out"
+				>
 					<ArrowRightOnRectangleIcon className=" h-6 w-6" />
 				</button>
 				<Select

@@ -17,12 +17,12 @@ export default function Layout({ children }: LayoutProps) {
 				isShow={showSidebar}
 				show={handleShowSidebar}
 			/>
-			<main className="flex min-h-screen tablet:pt-[84px]">
+			<main className="flex min-h-screen pt-[84px]">
 				<Sidebar
 					isShow={showSidebar}
 					show={handleShowSidebar}
 				/>
-				<article className="flex-grow bg-grey1 p-12 mobile:p-6">
+				<article className="flex-grow bg-grey1 px-20 py-12 mobile:p-6">
 					{children}
 				</article>
 			</main>

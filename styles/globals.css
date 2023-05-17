@@ -31,7 +31,7 @@ label {
 }
 
 .btn {
-	@apply rounded-md px-6 py-3 duration-200 hover:shadow-xl;
+	@apply inline-block rounded-md px-6 py-3 duration-200 hover:shadow-xl;
 }
 
 .btn--primary {

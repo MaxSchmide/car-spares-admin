@@ -28,9 +28,9 @@ const Sidebar = ({ isShow, show }: Props) => {
 	return (
 		<>
 			<aside
-				className={`w-1/5 bg-primary text-grey2 pt-8 duration-200 mobile:!w-1/2 ${
-					isShow ? "tablet:-translate-x-0" : "tablet:-translate-x-[100%]"
-				} tablet:fixed tablet:top-[84px] tablet:w-1/3 tablet:min-h-screen tablet:z-50`}
+				className={`w-1/5 bg-primary text-grey2 pt-8 duration-200  fixed top-[84px] min-h-screen z-50 mobile:!w-1/2 tablet:w-1/3  ${
+					isShow ? "-translate-x-0" : "-translate-x-[100%]"
+				}`}
 			>
 				<nav className="flex flex-col gap-4">
 					<Link
