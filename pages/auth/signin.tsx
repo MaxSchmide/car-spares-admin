@@ -1,4 +1,4 @@
-import { signIn, getSession, getCsrfToken } from "next-auth/react"
+import { getSession, signIn } from "next-auth/react"
 import { useRouter } from "next/router"
 
 const SignInPage = () => {
@@ -24,6 +24,9 @@ export async function getServerSideProps(context: any) {
 		return {
 			redirect: { destination: "/" },
 		}
+	}
+	return {
+		props: {},
 	}
 }
 

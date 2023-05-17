@@ -1,6 +1,5 @@
 import Layout from "@/components/Layout"
 import { useSession } from "next-auth/react"
-import Head from "next/head"
 import { useRouter } from "next/router"
 import { useCallback, useEffect } from "react"
 
