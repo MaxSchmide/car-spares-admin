@@ -1,6 +1,6 @@
 import clientPromise from "@/lib/mongodb"
 import { mongooseConnect } from "@/lib/mongoose"
-import { Admin, IAdmin } from "@/models/admin.model"
+import { Admin } from "@/models/admin.model"
 import { User } from "@/types/next-auth"
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter"
 import { NextApiRequest, NextApiResponse } from "next"
@@ -12,11 +12,11 @@ export const authOptions: AuthOptions = {
 	adapter: MongoDBAdapter(clientPromise),
 	providers: [
 		GoogleProvider({
-			clientId: process.env.GOOGLE_CLIENT_ID,
-			clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+			clientId: process.env.GOOGLE_CLIENT_ID!,
+			clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
 		}),
 	],
-	secret: process.env.NEXTAUTH_SECRET,
+	secret: process.env.NEXTAUTH_SECRET!,
 	pages: {
 		signIn: "/auth/signin",
 		error: "/auth/error",
