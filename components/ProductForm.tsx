@@ -11,14 +11,6 @@ import makeAnimated from "react-select/animated"
 import { ReactSortable } from "react-sortablejs"
 import { Spinner } from "./Spinner"
 
-const initialState = {
-	title: "",
-	description: "",
-	price: 0,
-	article: "",
-	analogs: "",
-}
-
 interface Props {
 	title?: string
 	description?: string
@@ -51,15 +43,13 @@ const ProductForm = ({
 	)
 	const [isUploading, setIsUploading] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
-	const [details, setDetails] = useState(
-		{
-			title,
-			description,
-			price,
-			article,
-			analogs: productAnalogs?.join(","),
-		} || initialState
-	)
+	const [details, setDetails] = useState({
+		title: title || "",
+		description: description || "",
+		price: price || "",
+		article: article || "",
+		analogs: productAnalogs?.join(",") || "",
+	})
 
 	const engLanguage = locale === "en"
 
@@ -133,10 +123,8 @@ const ProductForm = ({
 		} else {
 			await axios.post("/api/products", data).then(() => {
 				toast.success(engLanguage ? "Added" : "Добавлено")
-				setSelectedCategories([])
-				setImages([])
-				setDetails(initialState)
 				setIsLoading(false)
+				push("/products", "/products", { locale })
 			})
 		}
 	}
@@ -267,6 +255,7 @@ const ProductForm = ({
 							id="photos"
 							multiple
 							onChange={(e) => uploadImages(e)}
+							accept="image/*"
 						/>
 					</label>
 				</div>
@@ -287,7 +276,7 @@ const ProductForm = ({
 					{isLoading ? (
 						<button
 							type="submit"
-							className="w-1/5 mobile:w-1/2 flex items-center justify-center btn btn--load"
+							className="w-1/5 mobile:w-1/2 !flex items-center justify-center btn btn--load"
 							disabled
 						>
 							<Spinner />

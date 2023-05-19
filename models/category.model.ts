@@ -5,7 +5,7 @@ const CategorySchema = new Schema({
 	parent: { type: mongoose.Types.ObjectId, ref: "Category" },
 })
 
-export const Category = models.Category || model("Category", CategorySchema)
+export const Category = models?.Category || model("Category", CategorySchema)
 
 export interface ICategory {
 	label: string

@@ -28,11 +28,11 @@ const Sidebar = ({ isShow, show }: Props) => {
 	return (
 		<>
 			<aside
-				className={`w-1/5 bg-primary text-grey2 pt-8 duration-200  fixed top-[84px] min-h-screen z-50 mobile:!w-1/2 tablet:w-1/3  ${
+				className={`w-1/5 bg-primary text-grey2 pt-8 duration-200 overflow-scroll scrollbar fixed top-[84px] left-0 h-screen z-50 mobile:!w-1/2 tablet:w-1/3  ${
 					isShow ? "-translate-x-0" : "-translate-x-[100%]"
 				}`}
 			>
-				<nav className="flex flex-col gap-4">
+				<nav className="flex flex-col gap-4 ">
 					<Link
 						locale={locale}
 						href="/"
@@ -41,6 +41,7 @@ const Sidebar = ({ isShow, show }: Props) => {
 						<CircleStackIcon className="w-6 h-6" />
 						{engLanguage ? "Dashboard" : "Статистика"}
 					</Link>
+
 					<Link
 						locale={locale}
 						href="/orders"

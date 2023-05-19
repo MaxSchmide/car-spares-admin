@@ -5,7 +5,7 @@ const AdminSchema = new Schema({
 	role: { type: String, required: true },
 })
 
-export const Admin = models.Admin || model("Admin", AdminSchema)
+export const Admin = models?.Admin || model("Admin", AdminSchema)
 
 export interface IAdmin {
 	_id: string

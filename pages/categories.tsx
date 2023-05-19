@@ -11,7 +11,7 @@ import {
 	TrashIcon,
 } from "@heroicons/react/24/outline"
 import axios from "axios"
-import { useSession } from "next-auth/react"
+import { getSession } from "next-auth/react"
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
@@ -20,7 +20,6 @@ import makeAnimated from "react-select/animated"
 
 const CategoriesPage = () => {
 	const { push, locale } = useRouter()
-	const { status } = useSession()
 
 	const [categories, setCategories] = useState<ICategory[]>([])
 	const [isFetching, setIsFetching] = useState(false)
@@ -36,7 +35,6 @@ const CategoriesPage = () => {
 	const [sortField, setSortField] = useState<string>("")
 
 	const animatedComponents = makeAnimated()
-	const signedIn = status === "authenticated"
 	const engLanguage = locale === "en"
 	const title = editedCategory ? (
 		engLanguage ? (
@@ -84,6 +82,7 @@ const CategoriesPage = () => {
 	}
 
 	const selectCategory = (e: SingleValue<ICategory>) => {
+		console.log(e)
 		setSelectedCategory(e)
 	}
 
@@ -100,11 +99,13 @@ const CategoriesPage = () => {
 	}
 
 	const editCategory = async (category: ICategory) => {
-		const parentCategory = {
-			_id: category?.parent?._id,
-			label: category?.parent?.label,
-			__v: category?.parent?.__v,
-		}
+		const parentCategory = category.parent
+			? {
+					_id: category?.parent?._id,
+					label: category?.parent?.label,
+					__v: category?.parent?.__v,
+			  }
+			: null
 		setEditedCategory(category)
 		setCategoryTitle(category.label)
 		setSelectedCategory(parentCategory)
@@ -117,7 +118,7 @@ const CategoriesPage = () => {
 		setSelectedCategory(null)
 	}
 
-	const createCategory = async (e: React.FormEvent<HTMLFormElement>) => {
+	const saveCategory = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		setIsPending(true)
 
@@ -178,153 +179,164 @@ const CategoriesPage = () => {
 	}, [push])
 
 	useEffect(() => {
-		signedIn && fetchCategories()
-	}, [fetchCategories, signedIn])
+		fetchCategories()
+	}, [fetchCategories])
 
 	return (
-		<>
-			{signedIn && (
-				<Layout>
-					<main>
-						<h2 className="mb-2">{title}</h2>
-						<form
-							onSubmit={(e) => createCategory(e)}
-							className="mb-10 w-full flex items-center gap-8 mobile:flex-col"
-						>
-							<div className="input !py-1 !pr-0 w-full !mb-0 flex">
-								<input
-									required
-									className="bg-transparent  outline-none w-3/4 mobile:w-1/2"
-									placeholder={
-										engLanguage ? "Enter category name..." : "Введите название"
-									}
-									type="text"
-									id="category"
-									value={categoryTitle}
-									onChange={(e) => setCategoryTitle(e.target.value)}
-								/>
-								<Select
-									options={categories.map((cat) => {
-										return { ...cat, value: cat._id }
-									})}
-									components={animatedComponents}
-									styles={CategoriesPageSelectStyle}
-									value={selectedCategory}
-									placeholder={engLanguage ? "Parent..." : "Корневая..."}
-									isClearable
-									onChange={(e) => selectCategory(e)}
-									classNames={{
-										container: () => "mobile:!w-1/2",
-									}}
-								/>
-							</div>
-							<div
-								className={`w-1/6 flex mobile:!w-full mobile:justify-center ${
-									editedCategory && "flex !w-1/2 gap-2  mobile:justify-around"
-								}`}
-							>
-								{isPending ? (
-									<button
-										type="submit"
-										className={`w-full ${
-											editedCategory && "!w-1/2"
-										} mobile:!w-1/2  btn btn--load flex items-center justify-center`}
-										disabled
-									>
-										<Spinner size={6} />
-									</button>
-								) : (
-									<button
-										type="submit"
-										className={`w-full ${
-											editedCategory && "!w-1/2"
-										} mobile:!w-1/2  btn btn--secondary`}
-									>
-										{engLanguage ? "Save" : "Готово"}
-									</button>
-								)}
-								{editedCategory && (
-									<button
-										onClick={cleanCategoryForm}
-										type="button"
-										className="w-1/2 btn btn--primary"
-									>
-										{engLanguage ? "Cancel" : "Отмена"}
-									</button>
-								)}
-							</div>
-						</form>
-						{!isFetching ? (
-							categories.length ? (
-								<table className="basic">
-									<thead>
-										<tr>
-											<td
-												className="flex gap-2"
-												onClick={() => handleSortingChange("label")}
-											>
-												{engLanguage ? "Name" : "Название"}
-												{getSortIcons("label")}
-											</td>
-											<td className="mobile:hidden">
-												{engLanguage ? "Parent category" : "Корневая категория"}
-											</td>
-											<td></td>
-										</tr>
-									</thead>
-									<tbody>
-										{categories.map((category) => (
-											<tr key={category._id}>
-												<td className="w-1/2 mobile:w-full ">
-													<span
-														className="inline-block select-none cursor-pointer"
-														onDoubleClick={() => editCategory(category)}
-													>
-														{category.label}
-													</span>
-												</td>
-												<td className="w-1/2 mobile:hidden">
-													{category.parent?.label}
-												</td>
-												<td className="flex w-fit gap-2 items-center">
-													<button
-														className="btn btn--success !p-2"
-														onClick={() => editCategory(category)}
-													>
-														<PencilIcon className="w-6 h-6" />
-													</button>
-													<button
-														onClick={() => openModalToDelete(category)}
-														className="btn btn--danger !p-2"
-													>
-														<TrashIcon className="w-6 h-6" />
-													</button>
-												</td>
-											</tr>
-										))}
-									</tbody>
-								</table>
-							) : (
-								<h1>
-									{engLanguage
-										? "No categories are aviable"
-										: "Категорий не найдено"}
-								</h1>
-							)
-						) : (
-							<Spinner size={10} />
-						)}
-						<ModalDelete
-							show={showModal}
-							onClose={() => setShowModal(false)}
-							onDelete={deleteCategory}
-							category={modalData}
+		<Layout>
+			<main>
+				<h2 className="mb-2">{title}</h2>
+				<form
+					onSubmit={(e) => saveCategory(e)}
+					className="mb-10 w-full flex items-center gap-8 mobile:flex-col"
+				>
+					<div className="input !py-1 !pr-0 w-full !mb-0 flex">
+						<input
+							required
+							className="bg-transparent  outline-none w-3/4 mobile:w-1/2"
+							placeholder={
+								engLanguage ? "Enter category name..." : "Введите название"
+							}
+							type="text"
+							id="category"
+							value={categoryTitle}
+							onChange={(e) => setCategoryTitle(e.target.value)}
 						/>
-					</main>
-				</Layout>
-			)}
-		</>
+						<Select
+							options={categories.map((cat) => {
+								return { ...cat, value: cat._id }
+							})}
+							components={animatedComponents}
+							styles={CategoriesPageSelectStyle}
+							value={selectedCategory}
+							placeholder={engLanguage ? "Parent..." : "Корневая..."}
+							isClearable
+							onChange={(e) => selectCategory(e)}
+							classNames={{
+								container: () => "mobile:!w-1/2",
+							}}
+						/>
+					</div>
+					<div
+						className={`w-1/6 flex mobile:!w-full mobile:justify-center ${
+							editedCategory && "flex !w-1/2 gap-2  mobile:justify-around"
+						}`}
+					>
+						{isPending ? (
+							<button
+								type="submit"
+								className={`w-full ${
+									editedCategory && "!w-1/2"
+								} mobile:!w-1/2  btn btn--load flex items-center justify-center`}
+								disabled
+							>
+								<Spinner size={6} />
+							</button>
+						) : (
+							<button
+								type="submit"
+								className={`w-full ${
+									editedCategory && "!w-1/2"
+								} mobile:!w-1/2  btn btn--secondary`}
+							>
+								{engLanguage ? "Save" : "Готово"}
+							</button>
+						)}
+						{editedCategory && (
+							<button
+								onClick={cleanCategoryForm}
+								type="button"
+								className="w-1/2 btn btn--primary"
+							>
+								{engLanguage ? "Cancel" : "Отмена"}
+							</button>
+						)}
+					</div>
+				</form>
+				{!isFetching ? (
+					categories.length ? (
+						<table className="basic">
+							<thead>
+								<tr>
+									<td
+										className="flex gap-2"
+										onClick={() => handleSortingChange("label")}
+									>
+										{engLanguage ? "Name" : "Название"}
+										{getSortIcons("label")}
+									</td>
+									<td className="mobile:hidden">
+										{engLanguage ? "Parent category" : "Корневая категория"}
+									</td>
+									<td></td>
+								</tr>
+							</thead>
+							<tbody>
+								{categories.map((category) => (
+									<tr key={category._id}>
+										<td className="w-1/2 mobile:w-full ">
+											<span
+												className="inline-block select-none cursor-pointer"
+												onDoubleClick={() => editCategory(category)}
+											>
+												{category.label}
+											</span>
+										</td>
+										<td className="w-1/2 mobile:hidden">
+											{category.parent?.label}
+										</td>
+										<td className="flex w-fit gap-2 items-center">
+											<button
+												className="btn btn--success !p-2"
+												onClick={() => editCategory(category)}
+											>
+												<PencilIcon className="w-6 h-6" />
+											</button>
+											<button
+												onClick={() => openModalToDelete(category)}
+												className="btn btn--danger !p-2"
+											>
+												<TrashIcon className="w-6 h-6" />
+											</button>
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					) : (
+						<h1>
+							{engLanguage
+								? "No categories are aviable"
+								: "Категорий не найдено"}
+						</h1>
+					)
+				) : (
+					<Spinner size={10} />
+				)}
+				<ModalDelete
+					show={showModal}
+					onClose={() => setShowModal(false)}
+					onDelete={deleteCategory}
+					category={modalData}
+				/>
+			</main>
+		</Layout>
 	)
+}
+
+export const getServerSideProps = async (context: any) => {
+	const { req, defaultLocale } = context
+	const session = await getSession({ req })
+	if (!session) {
+		return {
+			redirect: {
+				destination: `${defaultLocale}/auth/signin`,
+			},
+		}
+	}
+	return {
+		props: {},
+	}
 }
 
 export default CategoriesPage

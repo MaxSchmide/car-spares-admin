@@ -1,22 +1,27 @@
 import Layout from "@/components/Layout"
-import { useSession } from "next-auth/react"
+import { getSession } from "next-auth/react"
 import { useRouter } from "next/router"
-import { useEffect } from "react"
 
 const OrdersPage = () => {
-	const { status } = useSession()
-	const { push, locale } = useRouter()
+	const { locale } = useRouter()
 
-	const signedIn = status === "authenticated"
 	const engLanguage = locale === "en"
 
-	useEffect(() => {
-		!signedIn && push("auth/error?error=AccessDenied")
-	}, [signedIn, push])
-
-	return (
-		<>{signedIn && <Layout> {engLanguage ? "Orders" : "Заказы"}</Layout>}</>
-	)
+	return <Layout> {engLanguage ? "Orders" : "Заказы"}</Layout>
+}
+export const getServerSideProps = async (context: any) => {
+	const { req, defaultLocale } = context
+	const session = await getSession({ req })
+	if (!session) {
+		return {
+			redirect: {
+				destination: `${defaultLocale}/auth/signin`,
+			},
+		}
+	}
+	return {
+		props: {},
+	}
 }
 
 export default OrdersPage

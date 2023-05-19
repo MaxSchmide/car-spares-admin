@@ -27,13 +27,15 @@ export default async function handle(
 				res.json(categoryDoc)
 				break
 			case "PUT":
-				await Category.updateOne(
-					{ _id },
-					{
-						label,
-						parent,
-					}
-				)
+				parent
+					? await Category.updateOne(
+							{ _id },
+							{
+								label,
+								parent,
+							}
+					  )
+					: await Category.updateOne({ _id }, { label, $unset: { parent: "" } })
 				res.json(true)
 				break
 			case "DELETE":

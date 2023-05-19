@@ -17,11 +17,11 @@ export default function Layout({ children }: LayoutProps) {
 				isShow={showSidebar}
 				show={handleShowSidebar}
 			/>
+			<Sidebar
+				isShow={showSidebar}
+				show={handleShowSidebar}
+			/>
 			<main className="flex min-h-screen pt-[84px]">
-				<Sidebar
-					isShow={showSidebar}
-					show={handleShowSidebar}
-				/>
 				<article className="flex-grow bg-grey1 px-20 py-12 mobile:p-6">
 					{children}
 				</article>
