@@ -2,7 +2,7 @@ import Layout from "@/components/Layout"
 import { getSession, useSession } from "next-auth/react"
 import { useRouter } from "next/router"
 
-export default function HomePage() {
+export default function HomePage({}) {
 	const { data: session } = useSession()
 	const { locale } = useRouter()
 

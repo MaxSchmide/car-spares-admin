@@ -98,25 +98,25 @@ const ProductsPage = () => {
 
 	return (
 		<Layout>
-			<header className="mb-20 flex justify-between">
-				<input
-					type="text"
-					className="input !mb-0 w-1/3 mobile:!w-full tablet:w-1/2 "
-					placeholder={
-						engLanguage ? "Filter by category..." : "Фильтр по категориям"
-					}
-					value={filterValue}
-					onChange={(e) => setFilterValue(e.target.value)}
-				/>
-				<Link
-					locale={locale}
-					href={"/products/new"}
-					className="w-fit btn btn--secondary"
-				>
-					{engLanguage ? "Add new product" : "Добавить новый"}
-				</Link>
-			</header>
 			<main>
+				<header className="mb-20 flex justify-between items-center mobile:flex-col-reverse mobile:gap-8 ">
+					<input
+						type="text"
+						className="input !mb-0 w-1/3 mobile:!w-full tablet:w-1/2 "
+						placeholder={
+							engLanguage ? "Filter by category..." : "Фильтр по категориям"
+						}
+						value={filterValue}
+						onChange={(e) => setFilterValue(e.target.value)}
+					/>
+					<Link
+						locale={locale}
+						href={"/products/new"}
+						className="w-fit btn btn--secondary"
+					>
+						{engLanguage ? "Add new product" : "Добавить новый"}
+					</Link>
+				</header>
 				{!isLoading ? (
 					products.length ? (
 						<table className="basic">

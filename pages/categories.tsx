@@ -18,21 +18,28 @@ import { toast } from "react-hot-toast"
 import Select, { SingleValue } from "react-select"
 import makeAnimated from "react-select/animated"
 
+type IProp = {
+	name: string
+	values: string
+	[key: string]: any
+}
+
 const CategoriesPage = () => {
 	const { push, locale } = useRouter()
 
-	const [categories, setCategories] = useState<ICategory[]>([])
 	const [isFetching, setIsFetching] = useState(false)
 	const [isPending, setIsPending] = useState(false)
+	const [categories, setCategories] = useState<ICategory[]>([])
+	const [properties, setProperties] = useState<IProp[]>([])
 	const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(
 		null
 	)
-	const [modalData, setModalData] = useState<ICategory>()
-	const [showModal, setShowModal] = useState(false)
 	const [categoryTitle, setCategoryTitle] = useState("")
 	const [editedCategory, setEditedCategory] = useState<ICategory | null>(null)
 	const [order, setOrder] = useState<string>("asc")
 	const [sortField, setSortField] = useState<string>("")
+	const [modalData, setModalData] = useState<ICategory>()
+	const [showModal, setShowModal] = useState(false)
 
 	const animatedComponents = makeAnimated()
 	const engLanguage = locale === "en"
@@ -81,13 +88,35 @@ const CategoriesPage = () => {
 		)
 	}
 
+	const openModalToDelete = (category: ICategory) => {
+		setModalData(category)
+		setShowModal(true)
+	}
+
+	const addProperty = () => {
+		setProperties((prev) => [...prev, { name: "", values: "" }])
+	}
+
+	const deleteProperty = (index: number) => {
+		setProperties((prev) => prev.filter((_, i) => i !== index))
+	}
+
+	const editProperty = (
+		e: React.ChangeEvent<HTMLInputElement>,
+		index: number
+	) => {
+		setProperties((prev) => {
+			;[...prev][index][e.target.name] = e.target.value
+			return [...prev]
+		})
+	}
+
 	const selectCategory = (e: SingleValue<ICategory>) => {
-		console.log(e)
 		setSelectedCategory(e)
 	}
 
 	const deleteCategory = async () => {
-		await axios.delete("/api/categories?id=" + modalData?._id).catch((e) => {
+		await axios.delete("/api/categories?_id=" + modalData?._id).catch((e) => {
 			console.log(e)
 			toast.error(
 				engLanguage
@@ -106,9 +135,15 @@ const CategoriesPage = () => {
 					__v: category?.parent?.__v,
 			  }
 			: null
+		const props =
+			category.properties?.map((p) => ({
+				name: p.name,
+				values: p.values.join(","),
+			})) || []
 		setEditedCategory(category)
 		setCategoryTitle(category.label)
 		setSelectedCategory(parentCategory)
+		setProperties(props)
 		window.scrollTo({ top: 0, behavior: "smooth" })
 	}
 
@@ -116,6 +151,7 @@ const CategoriesPage = () => {
 		setEditedCategory(null)
 		setCategoryTitle("")
 		setSelectedCategory(null)
+		setProperties([])
 	}
 
 	const saveCategory = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -125,6 +161,10 @@ const CategoriesPage = () => {
 		const data = {
 			label: categoryTitle,
 			parent: selectedCategory?._id,
+			properties: properties.map((p) => ({
+				name: p.name,
+				values: p.values.split(","),
+			})),
 		}
 
 		editedCategory
@@ -158,11 +198,6 @@ const CategoriesPage = () => {
 		fetchCategories()
 	}
 
-	const openModalToDelete = (category: ICategory) => {
-		setModalData(category)
-		setShowModal(true)
-	}
-
 	const fetchCategories = useCallback(async () => {
 		setIsFetching(true)
 		await axios
@@ -184,16 +219,16 @@ const CategoriesPage = () => {
 
 	return (
 		<Layout>
-			<main>
-				<h2 className="mb-2">{title}</h2>
-				<form
-					onSubmit={(e) => saveCategory(e)}
-					className="mb-10 w-full flex items-center gap-8 mobile:flex-col"
-				>
+			<h2 className="mb-2">{title}</h2>
+			<form
+				onSubmit={(e) => saveCategory(e)}
+				className="mb-10 w-full flex flex-col gap-4"
+			>
+				<div className=" flex items-center gap-8 mobile:flex-col ">
 					<div className="input !py-1 !pr-0 w-full !mb-0 flex">
 						<input
 							required
-							className="bg-transparent  outline-none w-3/4 mobile:w-1/2"
+							className="bg-transparent  outline-none w-3/4 mobile:w-1/2 tablet:!w-1/2"
 							placeholder={
 								engLanguage ? "Enter category name..." : "Введите название"
 							}
@@ -203,9 +238,12 @@ const CategoriesPage = () => {
 							onChange={(e) => setCategoryTitle(e.target.value)}
 						/>
 						<Select
-							options={categories.map((cat) => {
-								return { ...cat, value: cat._id }
-							})}
+							instanceId={locale}
+							options={categories
+								.filter((c) => c !== editedCategory)
+								.map((cat) => {
+									return { ...cat, value: cat._id }
+								})}
 							components={animatedComponents}
 							styles={CategoriesPageSelectStyle}
 							value={selectedCategory}
@@ -213,47 +251,86 @@ const CategoriesPage = () => {
 							isClearable
 							onChange={(e) => selectCategory(e)}
 							classNames={{
-								container: () => "mobile:!w-1/2",
+								container: () => "mobile:!w-1/2 tablet:!w-1/2",
 							}}
 						/>
 					</div>
-					<div
-						className={`w-1/6 flex mobile:!w-full mobile:justify-center ${
-							editedCategory && "flex !w-1/2 gap-2  mobile:justify-around"
-						}`}
-					>
-						{isPending ? (
-							<button
-								type="submit"
-								className={`w-full ${
-									editedCategory && "!w-1/2"
-								} mobile:!w-1/2  btn btn--load flex items-center justify-center`}
-								disabled
-							>
-								<Spinner size={6} />
-							</button>
-						) : (
-							<button
-								type="submit"
-								className={`w-full ${
-									editedCategory && "!w-1/2"
-								} mobile:!w-1/2  btn btn--secondary`}
-							>
-								{engLanguage ? "Save" : "Готово"}
-							</button>
-						)}
-						{editedCategory && (
-							<button
-								onClick={cleanCategoryForm}
-								type="button"
-								className="w-1/2 btn btn--primary"
-							>
-								{engLanguage ? "Cancel" : "Отмена"}
-							</button>
-						)}
+					<div className="w-1/6 flex mobile:w-fit tablet:w-fit whitespace-nowrap">
+						<button
+							onClick={addProperty}
+							type="button"
+							className="btn btn--primary ml-auto"
+						>
+							Add propetry
+						</button>
 					</div>
-				</form>
-				{!isFetching ? (
+				</div>
+				{!!properties.length &&
+					properties.map((p, i) => (
+						<div
+							key={i}
+							className="w-full flex gap-8 items-center mobile:flex-col mobile:mb-8"
+						>
+							<input
+								type="text"
+								name="name"
+								value={p.name}
+								placeholder={`Name ${i}`}
+								className="w-1/3 input !m-0 mobile:!w-full tablet:w-1/2 "
+								onChange={(e) => editProperty(e, i)}
+							/>
+							<input
+								type="text"
+								name="values"
+								value={p.values}
+								placeholder="Coma separated"
+								className="w-1/3 input !m-0 mobile:!w-full tablet:w-1/2 "
+								onChange={(e) => editProperty(e, i)}
+							/>
+							<button
+								type="button"
+								className="btn btn--primary mobile:w-1/3 mobile:!flex items-center justify-center"
+								onClick={() => deleteProperty(i)}
+							>
+								<TrashIcon className="w-6 h-6" />
+							</button>
+						</div>
+					))}
+				<div
+					className={`w-full flex mobile:!w-full mobile:justify-center ${
+						editedCategory && "flex  gap-2  mobile:justify-around"
+					}`}
+				>
+					{isPending ? (
+						<button
+							type="submit"
+							className={`w-1/6  mobile:!w-1/2  btn btn--load !flex items-center justify-center`}
+							disabled
+						>
+							<Spinner size={6} />
+						</button>
+					) : (
+						<button
+							type="submit"
+							className={`w-1/6  mobile:!w-1/2  btn btn--secondary`}
+						>
+							{engLanguage ? "Save" : "Готово"}
+						</button>
+					)}
+					{editedCategory && (
+						<button
+							onClick={cleanCategoryForm}
+							type="button"
+							className="w-1/6 btn btn--primary"
+						>
+							{engLanguage ? "Cancel" : "Отмена"}
+						</button>
+					)}
+				</div>
+			</form>
+
+			{!editedCategory &&
+				(!isFetching ? (
 					categories.length ? (
 						<table className="basic">
 							<thead>
@@ -312,14 +389,13 @@ const CategoriesPage = () => {
 					)
 				) : (
 					<Spinner size={10} />
-				)}
-				<ModalDelete
-					show={showModal}
-					onClose={() => setShowModal(false)}
-					onDelete={deleteCategory}
-					category={modalData}
-				/>
-			</main>
+				))}
+			<ModalDelete
+				show={showModal}
+				onClose={() => setShowModal(false)}
+				onDelete={deleteCategory}
+				category={modalData}
+			/>
 		</Layout>
 	)
 }

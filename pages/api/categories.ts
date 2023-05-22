@@ -1,5 +1,6 @@
 import { mongooseConnect } from "@/lib/mongoose"
 import { Category } from "@/models/category.model"
+import { ObjectId } from "mongodb"
 import { NextApiRequest, NextApiResponse } from "next"
 import { isAdminRequest } from "./auth/[...nextauth]"
 
@@ -13,7 +14,8 @@ export default async function handle(
 
 		const {
 			method,
-			body: { label, parent, _id },
+			body: { label, parent, _id, properties },
+			query,
 		} = req
 		switch (method) {
 			case "GET":
@@ -23,26 +25,29 @@ export default async function handle(
 				const categoryDoc = await Category.create({
 					label,
 					parent,
+					properties,
 				})
 				res.json(categoryDoc)
 				break
 			case "PUT":
-				parent
-					? await Category.updateOne(
-							{ _id },
-							{
+				await Category.updateOne(
+					{ _id },
+					parent
+						? {
 								label,
 								parent,
-							}
-					  )
-					: await Category.updateOne({ _id }, { label, $unset: { parent: "" } })
+								properties,
+						  }
+						: { label, properties, $unset: { parent: "" } }
+				)
 				res.json(true)
 				break
 			case "DELETE":
-				if (req.query?.id) {
-					await Category.deleteOne({ _id: req.query.id })
-					res.status(200).json(true)
-				}
+				const allChildCategories = await findChildCategories(
+					query._id as string
+				)
+				await Category.deleteMany({ _id: { $in: allChildCategories } })
+				res.status(200).json(true)
 				break
 			default:
 				res.status(400).json({ message: "Invalid request" })
@@ -50,4 +55,19 @@ export default async function handle(
 	} catch (error) {
 		res.status(500).json({ message: "Internal server error" })
 	}
+}
+
+const findChildCategories = async (id: string) => {
+	const listOfCategories: string[] = [id]
+
+	const categories = await Category.find({
+		parent: new ObjectId(id),
+	})
+
+	for (const category of categories) {
+		const children = await findChildCategories(category._id.valueOf())
+		listOfCategories.push(...children)
+	}
+
+	return listOfCategories
 }

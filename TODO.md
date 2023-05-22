@@ -13,3 +13,5 @@
 ### fix edit category (DONE)
 
 ### fix upload images input (DONE)
+
+### Refactor localizing using json templates

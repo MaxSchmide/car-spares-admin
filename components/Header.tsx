@@ -64,6 +64,7 @@ const Header = ({ isShow, show }: Props) => {
 					<ArrowRightOnRectangleIcon className=" h-6 w-6" />
 				</button>
 				<Select
+					instanceId={locale}
 					components={animatedComponents}
 					onChange={(e) => handleLangChange(e)}
 					styles={HeaderSelectStyle}

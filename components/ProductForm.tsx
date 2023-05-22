@@ -289,15 +289,6 @@ const ProductForm = ({
 							{engLanguage ? "SAVE" : "ГОТОВО"}
 						</button>
 					)}
-					{details && (
-						<button
-							type="button"
-							className="w-1/6 mobile:w-1/2 btn btn--primary"
-							onClick={() => push("/products", "/products", { locale })}
-						>
-							{engLanguage ? "Cancel" : "Отмена"}
-						</button>
-					)}
 				</div>
 			</form>
 		</>

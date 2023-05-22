@@ -5,8 +5,11 @@ import axios from "axios"
 import { toast } from "react-hot-toast"
 import ProductForm from "@/components/ProductForm"
 import { IProduct } from "@/models/product.model"
+import { ArrowLeftIcon } from "@heroicons/react/24/outline"
+
 const EditProduct = () => {
 	const {
+		push,
 		locale,
 		query: { id },
 	} = useRouter()
@@ -20,7 +23,11 @@ const EditProduct = () => {
 
 	return (
 		<Layout>
-			<h1 className="text-secondary mb-8 text-2xl">
+			<h1 className="text-secondary mb-8 text-2xl flex gap-2 items-center">
+				<ArrowLeftIcon
+					className="w-6 h-6 text-secondary cursor-pointer"
+					onClick={() => push("/products", "/products", { locale })}
+				/>
 				{locale === "en" ? "Edit Product" : "Изменить товар"}
 			</h1>
 			{product && <ProductForm {...product} />}
