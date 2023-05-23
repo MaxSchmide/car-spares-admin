@@ -18,7 +18,7 @@ export default async function handle(
 				description,
 				price,
 				_id,
-				categories,
+				category,
 				images,
 				article,
 				analogs,
@@ -28,10 +28,10 @@ export default async function handle(
 			case "GET":
 				if (req.query?.id) {
 					res.json(
-						await Product.findOne({ _id: req.query.id }).populate("categories")
+						await Product.findOne({ _id: req.query.id }).populate("category")
 					)
 				} else {
-					res.json(await Product.find().populate("categories"))
+					res.json(await Product.find().populate("category"))
 				}
 				break
 			case "POST":
@@ -40,7 +40,7 @@ export default async function handle(
 					description,
 					price,
 					images,
-					categories,
+					category,
 					article,
 					analogs,
 				})
@@ -49,7 +49,7 @@ export default async function handle(
 			case "PUT":
 				await Product.updateOne(
 					{ _id },
-					{ title, description, price, images, categories, article, analogs }
+					{ title, description, price, images, category, article, analogs }
 				)
 				res.json(true)
 				break

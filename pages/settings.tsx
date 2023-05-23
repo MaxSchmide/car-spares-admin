@@ -89,7 +89,7 @@ const SettingPage = () => {
 						{isPending ? (
 							<button
 								type="submit"
-								className="mobile:w-1/3 btn btn--load flex items-center justify-center"
+								className="mobile:w-1/3 btn btn--load !flex items-center justify-center"
 								disabled
 							>
 								<Spinner size={6} />

@@ -160,11 +160,7 @@ const ProductsPage = () => {
 											</span>
 										</td>
 										<td>{product.article}</td>
-										<td className="mobile:hidden">
-											{product.categories.map((category) => (
-												<p key={category._id}>{category.label}</p>
-											))}
-										</td>
+										<td className="mobile:hidden">{product.category?.label}</td>
 										<td>
 											<span className="flex w-fit gap-2 items-center ml-auto">
 												<Link

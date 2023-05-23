@@ -1,4 +1,6 @@
-### Make props for categories
+### Make props for categories (product form left)
+
+### Make select categories to single value in product form and db (DONE)
 
 ### Rewrite routes with unsigned user (DONE)
 

@@ -7,7 +7,7 @@ const ProductSchema = new Schema({
 	description: String,
 	article: { type: String, required: true },
 	price: { type: Number, required: true },
-	categories: [{ type: mongoose.Types.ObjectId, ref: Category }],
+	category: { type: mongoose.Types.ObjectId, ref: Category },
 	images: [String],
 	analogs: [{ type: String, required: true }],
 })
@@ -18,7 +18,7 @@ export interface IProduct {
 	title: string
 	description: string
 	price: number
-	categories: ICategory[]
+	category: ICategory
 	images: string[]
 	_id: string
 	article: string

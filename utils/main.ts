@@ -3,7 +3,7 @@ import { GroupBase, StylesConfig } from "react-select"
 
 export const ProductPageSelectStyle: StylesConfig<
 	ICategory,
-	true,
+	false,
 	GroupBase<ICategory>
 > = {
 	option: (styles, { isDisabled, isFocused, isSelected }) => {

@@ -6,7 +6,7 @@ import axios from "axios"
 import { useRouter } from "next/router"
 import React, { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
-import Select, { MultiValue } from "react-select"
+import Select, { MultiValue, SingleValue } from "react-select"
 import makeAnimated from "react-select/animated"
 import { ReactSortable } from "react-sortablejs"
 import { Spinner } from "./Spinner"
@@ -15,7 +15,7 @@ interface Props {
 	title?: string
 	description?: string
 	price?: number
-	categories?: ICategory[]
+	category?: ICategory
 	images?: string[]
 	article?: string
 	analogs?: string[]
@@ -26,7 +26,7 @@ const ProductForm = ({
 	title,
 	description,
 	price,
-	categories: productCategories,
+	category: productCategory,
 	images: productImages,
 	article,
 	analogs: productAnalogs,
@@ -38,8 +38,8 @@ const ProductForm = ({
 	const [images, setImages] = useState(
 		productImages?.map((image) => ({ id: image, src: image })) || []
 	)
-	const [selectedCategories, setSelectedCategories] = useState<ICategory[]>(
-		productCategories || []
+	const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(
+		productCategory || null
 	)
 	const [isUploading, setIsUploading] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
@@ -55,8 +55,8 @@ const ProductForm = ({
 
 	const animatedComponents = makeAnimated()
 
-	const selectCategories = (e: MultiValue<ICategory>) => {
-		setSelectedCategories(e.map((c) => c))
+	const selectCategories = (e: SingleValue<ICategory>) => {
+		setSelectedCategory(e as ICategory)
 	}
 
 	const fetchCategories = async () => {
@@ -101,13 +101,13 @@ const ProductForm = ({
 	const saveProduct = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setIsLoading(true)
-		const assignedCategories = selectedCategories.map((c) => c._id)
+		const assignedCategory = selectedCategory?._id
 		const assignedImages = images.map((image) => image.src)
 		const data = {
 			...details,
 			analogs: details?.analogs?.split(","),
 			images: assignedImages,
-			categories: assignedCategories,
+			category: assignedCategory,
 		}
 		if (_id) {
 			await axios
@@ -187,19 +187,30 @@ const ProductForm = ({
 					</div>
 				</div>
 				<label htmlFor="categories">
-					{engLanguage ? "Categories" : "Категории"}
+					{engLanguage ? "Category" : "Категория"}
 				</label>
 				<Select
-					placeholder={engLanguage ? "Select categories" : "Выберите категории"}
+					placeholder={engLanguage ? "Select category" : "Выберите категорию"}
 					required
 					options={categories.map((c) => ({ ...c, value: c._id }))}
 					styles={ProductPageSelectStyle}
 					closeMenuOnSelect={false}
-					value={selectedCategories?.map((c) => ({ ...c, value: c._id }))}
+					value={{ ...selectedCategory!, value: selectedCategory?._id }}
 					components={animatedComponents}
-					isMulti
 					onChange={(e) => selectCategories(e)}
 				/>
+				{/* {categories.length > 0 && (
+					<div className="flex ">
+						<input
+							type="text"
+							className="w-1/2"
+						/>
+						<select className="w-1/2">
+							<option value="">01</option>
+							<option value="">04</option>
+						</select>
+					</div>
+				)} */}
 				<label htmlFor="description">
 					{engLanguage ? "Product Description" : "Описание товара"}
 				</label>
