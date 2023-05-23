@@ -234,11 +234,11 @@ const ProductForm = ({
 					onChange={(e) => selectCategories(e)}
 				/>
 				{categories.length > 0 && (
-					<div className="flex gap-8 flex-wrap">
+					<div className="flex gap-8 flex-wrap mobile:flex-col mobile:gap-0">
 						{props?.map((prop, i) => (
 							<div
 								key={prop.name}
-								className="flex w-1/4 my-4 justify-around items-center"
+								className="flex w-1/4 my-4 justify-around items-center mobile:w-full "
 							>
 								<p className="w-1/3">{prop.name}:</p>
 								<Select

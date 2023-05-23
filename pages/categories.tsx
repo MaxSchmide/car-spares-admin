@@ -306,7 +306,7 @@ const CategoriesPage = () => {
 					{isPending ? (
 						<button
 							type="submit"
-							className={`w-1/6  mobile:!w-1/2  btn btn--load !flex items-center justify-center`}
+							className={`w-1/6  mobile:w-1/3  btn btn--load !flex items-center justify-center`}
 							disabled
 						>
 							<Spinner size={6} />
@@ -314,7 +314,7 @@ const CategoriesPage = () => {
 					) : (
 						<button
 							type="submit"
-							className={`w-1/6  mobile:!w-1/2  btn btn--secondary`}
+							className={`w-1/6  mobile:w-1/3  btn btn--secondary`}
 						>
 							{engLanguage ? "Save" : "Готово"}
 						</button>
@@ -323,7 +323,7 @@ const CategoriesPage = () => {
 						<button
 							onClick={cleanCategoryForm}
 							type="button"
-							className="w-1/6 btn btn--primary"
+							className="w-1/6  mobile:w-1/3 btn btn--primary"
 						>
 							{engLanguage ? "Cancel" : "Отмена"}
 						</button>
