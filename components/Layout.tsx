@@ -13,10 +13,7 @@ export default function Layout({ children }: LayoutProps) {
 
 	return (
 		<>
-			<Header
-				isShow={showSidebar}
-				show={handleShowSidebar}
-			/>
+			<Header show={handleShowSidebar} />
 			<Sidebar
 				isShow={showSidebar}
 				show={handleShowSidebar}
