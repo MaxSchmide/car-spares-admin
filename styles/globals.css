@@ -54,7 +54,7 @@ label {
 }
 
 table.basic {
-	@apply w-full shadow-xl border-collapse;
+	@apply w-full shadow-xl border-collapse table-fixed;
 }
 table.basic thead {
 	@apply bg-secondary text-white;

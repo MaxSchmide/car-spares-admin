@@ -19,7 +19,7 @@ export default function Layout({ children }: LayoutProps) {
 				show={handleShowSidebar}
 			/>
 			<main className="flex min-h-screen pt-[84px]">
-				<article className="flex-grow bg-grey1 px-20 py-12 mobile:p-6">
+				<article className="flex-grow  min-h-screen bg-grey1 px-20 py-12 mobile:p-6">
 					{children}
 				</article>
 			</main>

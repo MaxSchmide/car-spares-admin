@@ -1,6 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 import { ICategory } from "@/models/category.model"
-import { HeaderSelectStyle, ProductPageSelectStyle } from "@/utils/main"
+import {
+	DefaultSelectStyle,
+	HeaderSelectStyle,
+	ProductPageSelectStyle,
+} from "@/utils/main"
 import { DocumentArrowUpIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import axios from "axios"
 import { useRouter } from "next/router"
@@ -22,6 +26,7 @@ interface Props {
 	application?: string
 	properties?: Object
 	_id?: string
+	brand?: string
 }
 
 const ProductForm = ({
@@ -34,6 +39,7 @@ const ProductForm = ({
 	analogs: productAnalogs,
 	application,
 	properties,
+	brand,
 	_id,
 }: Props) => {
 	const { push, locale } = useRouter()
@@ -51,6 +57,7 @@ const ProductForm = ({
 	const [isUploading, setIsUploading] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
 	const [details, setDetails] = useState({
+		brand: brand || "",
 		application: application || "",
 		title: title || "",
 		description: description || "",
@@ -172,19 +179,36 @@ const ProductForm = ({
 				onSubmit={(e) => saveProduct(e)}
 				className="flex flex-col gap-4"
 			>
-				<label htmlFor="title">
-					{engLanguage ? "Product name" : "Название товара"}
-				</label>
-				<input
-					type="text"
-					name="title"
-					id="title"
-					placeholder={engLanguage ? "Enter title" : "Введите название"}
-					value={details.title}
-					onChange={(e) => inputChangeHandler(e)}
-					required
-					className="input"
-				/>
+				<div className="flex gap-8 mobile:flex-col mobile:gap-4">
+					<div className="flex flex-col w-1/2 gap-2 mobile:w-full">
+						<label htmlFor="title">
+							{engLanguage ? "Product name" : "Название товара"}
+						</label>
+						<input
+							type="text"
+							name="title"
+							id="title"
+							placeholder={engLanguage ? "Enter title" : "Введите название"}
+							value={details.title}
+							onChange={(e) => inputChangeHandler(e)}
+							required
+							className="input"
+						/>
+					</div>
+					<div className="flex flex-col w-1/2 gap-2 mobile:w-full">
+						<label htmlFor="brand">{engLanguage ? "Brand" : "Бренд"}</label>
+						<input
+							type="text"
+							name="brand"
+							id="brand"
+							placeholder={engLanguage ? "Enter brand" : "Введите бренд"}
+							value={details.brand}
+							onChange={(e) => inputChangeHandler(e)}
+							required
+							className="input"
+						/>
+					</div>
+				</div>
 				<div className="flex flex-col gap-4 mb-4">
 					<div className="flex gap-2 items-center">
 						<label htmlFor="article">
@@ -242,6 +266,7 @@ const ProductForm = ({
 							>
 								<p className="w-1/3">{prop.name}:</p>
 								<Select
+									styles={DefaultSelectStyle}
 									options={prop.values.map((v) => ({ label: v, value: v }))}
 									isClearable
 									isSearchable={false}
@@ -254,21 +279,6 @@ const ProductForm = ({
 									}}
 									onChange={(e) => selectProps(e, prop.name)}
 								/>
-								{/* <select
-									name="props"
-									id="props"
-									value={selectedProps[prop.name]}
-									onChange={(e) => selectProps(e, prop.name)}
-								>
-									{prop.values.map((v: any) => (
-										<option
-											key={v}
-											value={v}
-										>
-											{v}
-										</option>
-									))}
-								</select> */}
 							</div>
 						))}
 					</div>

@@ -4,6 +4,7 @@ import { Category } from "./category.model"
 
 const ProductSchema = new Schema({
 	title: { type: String, required: true },
+	brand: { type: String, required: true },
 	description: String,
 	application: String,
 	article: { type: String, required: true },
@@ -17,6 +18,7 @@ const ProductSchema = new Schema({
 export const Product = models?.Product || model("Product", ProductSchema)
 
 export interface IProduct {
+	brand: string
 	title: string
 	description: string
 	price: number

@@ -24,6 +24,7 @@ export default async function handle(
 				article,
 				analogs,
 				properties,
+				brand,
 			},
 		} = req
 		switch (method) {
@@ -47,6 +48,7 @@ export default async function handle(
 					analogs,
 					application,
 					properties,
+					brand,
 				})
 				res.json(productDoc)
 				break
@@ -63,6 +65,7 @@ export default async function handle(
 						analogs,
 						application,
 						properties,
+						brand,
 					}
 				)
 				res.json(true)

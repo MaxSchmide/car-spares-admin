@@ -98,28 +98,28 @@ const ProductsPage = () => {
 
 	return (
 		<Layout>
-			<main>
-				<header className="mb-20 flex justify-between items-center mobile:flex-col-reverse mobile:gap-8 ">
-					<input
-						type="text"
-						className="input !mb-0 w-1/3 mobile:!w-full tablet:w-1/2 "
-						placeholder={
-							engLanguage ? "Filter by category..." : "Фильтр по категориям"
-						}
-						value={filterValue}
-						onChange={(e) => setFilterValue(e.target.value)}
-					/>
-					<Link
-						locale={locale}
-						href={"/products/new"}
-						className="w-fit btn btn--secondary"
-					>
-						{engLanguage ? "Add new product" : "Добавить новый"}
-					</Link>
-				</header>
-				{!isLoading ? (
-					products.length ? (
-						<table className="basic">
+			<header className="mb-20 flex justify-between items-center mobile:flex-col-reverse mobile:gap-8 ">
+				<input
+					type="text"
+					className="input !mb-0 w-1/3 mobile:!w-full tablet:w-1/2 "
+					placeholder={
+						engLanguage ? "Filter by category..." : "Фильтр по категориям"
+					}
+					value={filterValue}
+					onChange={(e) => setFilterValue(e.target.value)}
+				/>
+				<Link
+					locale={locale}
+					href={"/products/new"}
+					className="w-fit btn btn--secondary"
+				>
+					{engLanguage ? "Add new product" : "Добавить новый"}
+				</Link>
+			</header>
+			{!isLoading ? (
+				products.length ? (
+					<div className="overflow-x-auto">
+						<table className="basic ">
 							<thead>
 								<tr>
 									<td>
@@ -198,15 +198,15 @@ const ProductsPage = () => {
 									))}
 							</tbody>
 						</table>
-					) : (
-						<h1>
-							{engLanguage ? "No products are aviable" : "Товары не найдены"}
-						</h1>
-					)
+					</div>
 				) : (
-					<Spinner size={10} />
-				)}
-			</main>
+					<h1>
+						{engLanguage ? "No products are aviable" : "Товары не найдены"}
+					</h1>
+				)
+			) : (
+				<Spinner size={10} />
+			)}
 			<ModalDelete
 				show={showModal}
 				onClose={() => setShowModal(false)}
