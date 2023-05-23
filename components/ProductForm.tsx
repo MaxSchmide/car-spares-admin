@@ -262,7 +262,7 @@ const ProductForm = ({
 						{props?.map((prop, i) => (
 							<div
 								key={prop.name}
-								className="flex w-1/4 my-4 justify-around items-center mobile:w-full "
+								className="flex w-1/3 my-4 justify-around items-center mobile:w-full "
 							>
 								<p className="w-1/3">{prop.name}:</p>
 								<Select
