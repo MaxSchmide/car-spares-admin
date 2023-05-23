@@ -261,7 +261,7 @@ const CategoriesPage = () => {
 							type="button"
 							className="btn btn--primary ml-auto"
 						>
-							Add propetry
+							{engLanguage ? "Add Property" : "Добавить свойство"}
 						</button>
 					</div>
 				</div>
@@ -275,7 +275,9 @@ const CategoriesPage = () => {
 								type="text"
 								name="name"
 								value={p.name}
-								placeholder={`Name ${i}`}
+								placeholder={
+									engLanguage ? `Name ${i + 1}` : `Название ${i + 1}`
+								}
 								className="w-1/3 input !m-0 mobile:!w-full tablet:w-1/2 "
 								onChange={(e) => editProperty(e, i)}
 							/>
@@ -283,7 +285,7 @@ const CategoriesPage = () => {
 								type="text"
 								name="values"
 								value={p.values}
-								placeholder="Coma separated"
+								placeholder={engLanguage ? "Coma separated" : "Через запятую"}
 								className="w-1/3 input !m-0 mobile:!w-full tablet:w-1/2 "
 								onChange={(e) => editProperty(e, i)}
 							/>

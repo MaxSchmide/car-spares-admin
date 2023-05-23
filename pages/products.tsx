@@ -147,39 +147,55 @@ const ProductsPage = () => {
 								</tr>
 							</thead>
 							<tbody>
-								{products.map((product) => (
-									<tr key={product._id}>
-										<td>
-											<span
-												className="inline-block select-none cursor-pointer"
-												onDoubleClick={() =>
-													push("/products/edit/" + product._id)
-												}
-											>
-												{product.title}
-											</span>
-										</td>
-										<td>{product.article}</td>
-										<td className="mobile:hidden">{product.category?.label}</td>
-										<td>
-											<span className="flex w-fit gap-2 items-center ml-auto">
-												<Link
-													locale={locale}
-													className="btn btn--success !p-2"
-													href={"/products/edit/" + product._id}
+								{products
+									.filter((prod) => {
+										if (prod.category) {
+											return (
+												prod.category.label
+													.toLowerCase()
+													.includes(filterValue.toLowerCase()) && prod
+											)
+										} else return !filterValue && prod
+									})
+									.map((product) => (
+										<tr key={product._id}>
+											<td>
+												<span
+													className="inline-block select-none cursor-pointer"
+													onDoubleClick={() =>
+														push(
+															"/products/edit/" + product._id,
+															"/products/edit/" + product._id,
+															{ locale }
+														)
+													}
 												>
-													<PencilIcon className="w-6 h-6" />
-												</Link>
-												<button
-													onClick={() => openModalToDelete(product)}
-													className="btn btn--danger !p-2"
-												>
-													<TrashIcon className="w-6 h-6" />
-												</button>
-											</span>
-										</td>
-									</tr>
-								))}
+													{product.title}
+												</span>
+											</td>
+											<td>{product.article}</td>
+											<td className="mobile:hidden">
+												{product.category?.label}
+											</td>
+											<td>
+												<span className="flex w-fit gap-2 items-center ml-auto">
+													<Link
+														className="btn btn--success !p-2"
+														href={"/products/edit/" + product._id}
+														locale={locale}
+													>
+														<PencilIcon className="w-6 h-6" />
+													</Link>
+													<button
+														onClick={() => openModalToDelete(product)}
+														className="btn btn--danger !p-2"
+													>
+														<TrashIcon className="w-6 h-6" />
+													</button>
+												</span>
+											</td>
+										</tr>
+									))}
 							</tbody>
 						</table>
 					) : (

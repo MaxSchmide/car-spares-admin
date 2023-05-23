@@ -14,6 +14,7 @@ export default async function handle(
 		const {
 			method,
 			body: {
+				application,
 				title,
 				description,
 				price,
@@ -22,6 +23,7 @@ export default async function handle(
 				images,
 				article,
 				analogs,
+				properties,
 			},
 		} = req
 		switch (method) {
@@ -43,13 +45,25 @@ export default async function handle(
 					category,
 					article,
 					analogs,
+					application,
+					properties,
 				})
 				res.json(productDoc)
 				break
 			case "PUT":
 				await Product.updateOne(
 					{ _id },
-					{ title, description, price, images, category, article, analogs }
+					{
+						title,
+						description,
+						price,
+						images,
+						category,
+						article,
+						analogs,
+						application,
+						properties,
+					}
 				)
 				res.json(true)
 				break

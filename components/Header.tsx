@@ -12,21 +12,18 @@ import Select, { SingleValue } from "react-select"
 import makeAnimated from "react-select/animated"
 
 type Props = {
-	isShow: boolean
 	show: () => void
 }
 
-const Header = ({ isShow, show }: Props) => {
-	const { pathname, push, locale, locales } = useRouter()
-
-	const title = locale === "en" ? "Admin Panel" : "Панель управления"
+const Header = ({ show }: Props) => {
+	const { pathname, push, asPath, locale, locales } = useRouter()
 
 	const animatedComponents = makeAnimated()
 
 	const handleLangChange = (
 		e: SingleValue<{ value: string; label: string }>
 	) => {
-		push(pathname, pathname, { locale: e?.value })
+		push(pathname, asPath, { locale: e?.value })
 	}
 
 	const logout = async () => {

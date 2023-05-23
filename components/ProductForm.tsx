@@ -1,12 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 import { ICategory } from "@/models/category.model"
-import { ProductPageSelectStyle } from "@/utils/main"
+import { HeaderSelectStyle, ProductPageSelectStyle } from "@/utils/main"
 import { DocumentArrowUpIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import axios from "axios"
 import { useRouter } from "next/router"
 import React, { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
-import Select, { MultiValue, SingleValue } from "react-select"
+import Select, { SingleValue } from "react-select"
 import makeAnimated from "react-select/animated"
 import { ReactSortable } from "react-sortablejs"
 import { Spinner } from "./Spinner"
@@ -19,6 +19,8 @@ interface Props {
 	images?: string[]
 	article?: string
 	analogs?: string[]
+	application?: string
+	properties: Object
 	_id?: string
 }
 
@@ -30,13 +32,18 @@ const ProductForm = ({
 	images: productImages,
 	article,
 	analogs: productAnalogs,
+	application,
+	properties,
 	_id,
 }: Props) => {
-	const { push, locale } = useRouter()
+	const { push, asPath, locale } = useRouter()
 
 	const [categories, setCategories] = useState<ICategory[]>([])
 	const [images, setImages] = useState(
 		productImages?.map((image) => ({ id: image, src: image })) || []
+	)
+	const [selectedProps, setSelectedProps] = useState<{ [key: string]: any }>(
+		properties || {}
 	)
 	const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(
 		productCategory || null
@@ -44,6 +51,7 @@ const ProductForm = ({
 	const [isUploading, setIsUploading] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
 	const [details, setDetails] = useState({
+		application: application || "",
 		title: title || "",
 		description: description || "",
 		price: price || "",
@@ -52,6 +60,7 @@ const ProductForm = ({
 	})
 
 	const engLanguage = locale === "en"
+	const props = []
 
 	const animatedComponents = makeAnimated()
 
@@ -62,6 +71,17 @@ const ProductForm = ({
 	const fetchCategories = async () => {
 		const res = await axios.get("/api/categories")
 		setCategories(res.data)
+	}
+
+	const selectProps = (
+		e: SingleValue<{ label: any; value: any }>,
+		name: string
+	) => {
+		setSelectedProps((prev) => {
+			const newProps = { ...prev }
+			newProps[name] = e?.value
+			return newProps
+		})
 	}
 
 	const uploadImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,6 +128,7 @@ const ProductForm = ({
 			analogs: details?.analogs?.split(","),
 			images: assignedImages,
 			category: assignedCategory,
+			properties: selectedProps,
 		}
 		if (_id) {
 			await axios
@@ -116,15 +137,15 @@ const ProductForm = ({
 					_id,
 				})
 				.then(() => {
-					toast.success(engLanguage ? "Edited" : "Изменено")
 					setIsLoading(false)
 					push("/products", "/products", { locale })
+					toast.success(engLanguage ? "Edited" : "Изменено")
 				})
 		} else {
 			await axios.post("/api/products", data).then(() => {
-				toast.success(engLanguage ? "Added" : "Добавлено")
 				setIsLoading(false)
 				push("/products", "/products", { locale })
+				toast.success(engLanguage ? "Added" : "Добавлено")
 			})
 		}
 	}
@@ -132,6 +153,18 @@ const ProductForm = ({
 	useEffect(() => {
 		fetchCategories()
 	}, [])
+
+	if (categories.length > 0 && selectedCategory) {
+		let catInfo = categories.find(({ _id }) => _id === selectedCategory._id)
+		props.push(...catInfo?.properties!)
+		while (catInfo?.parent?._id) {
+			const parentCat = categories.find(
+				({ _id }) => _id === catInfo?.parent?._id
+			)
+			props.push(...parentCat?.properties!)
+			catInfo = parentCat
+		}
+	}
 
 	return (
 		<>
@@ -191,26 +224,66 @@ const ProductForm = ({
 				</label>
 				<Select
 					placeholder={engLanguage ? "Select category" : "Выберите категорию"}
+					instanceId={locale}
 					required
+					isClearable
 					options={categories.map((c) => ({ ...c, value: c._id }))}
 					styles={ProductPageSelectStyle}
-					closeMenuOnSelect={false}
-					value={{ ...selectedCategory!, value: selectedCategory?._id }}
+					value={selectedCategory}
 					components={animatedComponents}
 					onChange={(e) => selectCategories(e)}
 				/>
-				{/* {categories.length > 0 && (
-					<div className="flex ">
-						<input
-							type="text"
-							className="w-1/2"
-						/>
-						<select className="w-1/2">
-							<option value="">01</option>
-							<option value="">04</option>
-						</select>
+				{categories.length > 0 && (
+					<div className="flex gap-8 flex-wrap">
+						{props?.map((prop, i) => (
+							<div
+								key={prop.name}
+								className="flex w-1/4 my-4 justify-around items-center"
+							>
+								<p className="w-1/3">{prop.name}:</p>
+								<Select
+									options={prop.values.map((v) => ({ label: v, value: v }))}
+									isClearable
+									isSearchable={false}
+									value={{
+										label: selectedProps[prop.name],
+										value: selectedProps[prop.name],
+									}}
+									classNames={{
+										container: () => "w-2/3",
+									}}
+									onChange={(e) => selectProps(e, prop.name)}
+								/>
+								{/* <select
+									name="props"
+									id="props"
+									value={selectedProps[prop.name]}
+									onChange={(e) => selectProps(e, prop.name)}
+								>
+									{prop.values.map((v: any) => (
+										<option
+											key={v}
+											value={v}
+										>
+											{v}
+										</option>
+									))}
+								</select> */}
+							</div>
+						))}
 					</div>
-				)} */}
+				)}
+
+				<label htmlFor="application">
+					{engLanguage ? "Application" : "Применение"}
+				</label>
+				<textarea
+					name="application"
+					id="application"
+					placeholder={engLanguage ? "(Optional)" : "(Дополнительно)"}
+					value={details.application}
+					onChange={(e) => inputChangeHandler(e)}
+				/>
 				<label htmlFor="description">
 					{engLanguage ? "Product Description" : "Описание товара"}
 				</label>

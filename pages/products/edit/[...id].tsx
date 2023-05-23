@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast"
 import ProductForm from "@/components/ProductForm"
 import { IProduct } from "@/models/product.model"
 import { ArrowLeftIcon } from "@heroicons/react/24/outline"
+import { getSession } from "next-auth/react"
 
 const EditProduct = () => {
 	const {
@@ -36,3 +37,18 @@ const EditProduct = () => {
 }
 
 export default EditProduct
+
+export const getServerSideProps = async (context: any) => {
+	const { req, defaultLocale } = context
+	const session = await getSession({ req })
+	if (!session) {
+		return {
+			redirect: {
+				destination: `${defaultLocale}/auth/signin`,
+			},
+		}
+	}
+	return {
+		props: {},
+	}
+}
