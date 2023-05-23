@@ -20,7 +20,7 @@ interface Props {
 	article?: string
 	analogs?: string[]
 	application?: string
-	properties: Object
+	properties?: Object
 	_id?: string
 }
 
@@ -36,7 +36,7 @@ const ProductForm = ({
 	properties,
 	_id,
 }: Props) => {
-	const { push, asPath, locale } = useRouter()
+	const { push, locale } = useRouter()
 
 	const [categories, setCategories] = useState<ICategory[]>([])
 	const [images, setImages] = useState(
