@@ -14,7 +14,7 @@ export default async function handle(
 
 		const {
 			method,
-			body: { label, parent, _id, properties },
+			body: { label, parent, _id, properties, image },
 			query,
 		} = req
 		switch (method) {
@@ -26,6 +26,7 @@ export default async function handle(
 					label,
 					parent,
 					properties,
+					image,
 				})
 				res.json(categoryDoc)
 				break
@@ -37,8 +38,9 @@ export default async function handle(
 								label,
 								parent,
 								properties,
+								image,
 						  }
-						: { label, properties, $unset: { parent: "" } }
+						: { label, properties, image, $unset: { parent: "" } }
 				)
 				res.json(true)
 				break

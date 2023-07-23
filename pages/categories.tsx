@@ -1,7 +1,7 @@
 import Layout from "@/components/Layout"
 import ModalDelete from "@/components/ModalDelete"
 import { Spinner } from "@/components/Spinner"
-import { ICategory } from "@/models/category.model"
+import { ICategory, ICategoryImage } from "@/models/category.model"
 import { CategoriesPageSelectStyle } from "@/utils/main"
 import {
 	ChevronDownIcon,
@@ -9,6 +9,7 @@ import {
 	ChevronUpIcon,
 	PencilIcon,
 	TrashIcon,
+	XMarkIcon,
 } from "@heroicons/react/24/outline"
 import axios from "axios"
 import { getSession } from "next-auth/react"
@@ -29,12 +30,16 @@ const CategoriesPage = () => {
 
 	const [isFetching, setIsFetching] = useState(false)
 	const [isPending, setIsPending] = useState(false)
+	const [isUploading, setIsUploading] = useState(false)
 	const [categories, setCategories] = useState<ICategory[]>([])
 	const [properties, setProperties] = useState<IProp[]>([])
 	const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(
 		null
 	)
 	const [categoryTitle, setCategoryTitle] = useState("")
+	const [categoryImage, setCategoryImage] = useState<ICategoryImage | null>(
+		null
+	)
 	const [editedCategory, setEditedCategory] = useState<ICategory | null>(null)
 	const [order, setOrder] = useState<string>("asc")
 	const [sortField, setSortField] = useState<string>("")
@@ -93,6 +98,27 @@ const CategoriesPage = () => {
 		setShowModal(true)
 	}
 
+	const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const files = e.target.files!
+
+		setIsUploading(true)
+		if (categoryImage) {
+			await axios.delete("/api/delete?id=" + categoryImage.id)
+		}
+
+		const data = new FormData()
+		data.append("file", files[0])
+		await axios.post("/api/upload", data).then((res) => {
+			const image = {
+				id: res.data.links[0],
+				src: res.data.links[0],
+				name: files[0].name,
+			}
+			setCategoryImage(image)
+			setIsUploading(false)
+		})
+	}
+
 	const addProperty = () => {
 		setProperties((prev) => [...prev, { name: "", values: "" }])
 	}
@@ -130,9 +156,10 @@ const CategoriesPage = () => {
 	const editCategory = async (category: ICategory) => {
 		const parentCategory = category.parent
 			? {
-					_id: category?.parent?._id,
-					label: category?.parent?.label,
-					__v: category?.parent?.__v,
+					_id: category?.parent._id,
+					label: category?.parent.label,
+					__v: category?.parent.__v,
+					image: category?.parent.image,
 			  }
 			: null
 		const props =
@@ -144,6 +171,7 @@ const CategoriesPage = () => {
 		setCategoryTitle(category.label)
 		setSelectedCategory(parentCategory)
 		setProperties(props)
+		setCategoryImage({ ...category.image, id: category.image?.src })
 		window.scrollTo({ top: 0, behavior: "smooth" })
 	}
 
@@ -152,6 +180,7 @@ const CategoriesPage = () => {
 		setCategoryTitle("")
 		setSelectedCategory(null)
 		setProperties([])
+		setCategoryImage(null)
 	}
 
 	const saveCategory = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -165,6 +194,10 @@ const CategoriesPage = () => {
 				name: p.name,
 				values: p.values.split(","),
 			})),
+			image: {
+				src: categoryImage?.src,
+				name: categoryImage?.name,
+			},
 		}
 
 		editedCategory
@@ -299,14 +332,14 @@ const CategoriesPage = () => {
 						</div>
 					))}
 				<div
-					className={`w-full flex mobile:!w-full mobile:justify-center ${
-						editedCategory && "flex  gap-2  mobile:justify-around"
+					className={`w-full flex gap-2 mobile:!w-full mobile:flex-col mobile:items-center mobile:justify-center ${
+						editedCategory && "mobile:justify-around"
 					}`}
 				>
 					{isPending ? (
 						<button
 							type="submit"
-							className={`w-1/6  mobile:w-1/3  btn btn--load !flex items-center justify-center`}
+							className={`w-1/6  mobile:!w-1/2 tablet:w-fit btn btn--load !flex items-center justify-center`}
 							disabled
 						>
 							<Spinner size={6} />
@@ -314,16 +347,40 @@ const CategoriesPage = () => {
 					) : (
 						<button
 							type="submit"
-							className={`w-1/6  mobile:w-1/3  btn btn--secondary`}
+							className={`w-1/6 tablet:w-fit mobile:!w-1/2 btn btn--secondary`}
 						>
 							{engLanguage ? "Save" : "Готово"}
 						</button>
 					)}
+					<label
+						htmlFor="photos"
+						className={`w-1/6 mobile:!w-1/2 tablet:w-fit relative whitespace-nowrap duration-200 cursor-pointer btn btn--outline !flex justify-center ${
+							isUploading && "btn--load"
+						}`}
+					>
+						{isUploading ? (
+							<Spinner size={6} />
+						) : (
+							<p className="line-clamp-1">
+								{categoryImage?.name || (engLanguage ? "Photo" : "Фото")}
+							</p>
+						)}
+						<input
+							className="hidden"
+							type="file"
+							name="photos"
+							id="photos"
+							multiple
+							onChange={(e) => uploadImage(e)}
+							accept="image/*"
+							disabled={isUploading}
+						/>
+					</label>
 					{editedCategory && (
 						<button
 							onClick={cleanCategoryForm}
 							type="button"
-							className="w-1/6  mobile:w-1/3 btn btn--primary"
+							className="w-1/6  mobile:!w-1/2 tablet:w-fit btn btn--primary"
 						>
 							{engLanguage ? "Cancel" : "Отмена"}
 						</button>
